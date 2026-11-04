@@ -3,7 +3,7 @@
 Each item below is one Blueprint feature loop: `/feature` → `/implement` → `/check` → `/complete`. They are ordered so that every step builds on a working app.
 
 ## Phase 1 — Foundation
-- [ ] **1. App shell**
+- [x] **1. App shell**
   - Express server with `/api/health`, MongoDB connection, central error handler, CORS and cookie-parser.
   - React Router with a layout: navbar, footer with TMDB attribution, and placeholder pages for every route.
   - A 404 page.
