@@ -1,6 +1,6 @@
 # Movie Manager - Project Overview
 
-<!-- blueprint:source-hash 49a0d06b90721823d24fc1bd50595981a1ca9ea156b18960569d93ee432739ca -->
+<!-- blueprint:source-hash 145996a8da421f7a300c1f9c75ee5c5cc17f5e1d8b8d55fcb59d059356519966 -->
 
 > A private movie tracker: search TMDB, keep a watchlist, rate what you watched,
 > and organise films into your own lists.
@@ -38,7 +38,8 @@ In `build-plan.md` order. One Blueprint feature loop each.
    attribution, placeholder pages, 404).
 2. **Register & login** - User model, register/login/logout endpoints, bcryptjs
    hashing, JWT in an httpOnly cookie, and the two forms with validation.
-3. **Session & protected routes** - `GET /auth/me`, `requireAuth`, `AuthContext`,
+3. **Session & protected routes** - `GET /auth/me`, `requireAuth` (also added to
+   `POST /auth/logout`, which feature 2 ships unguarded), `AuthContext`,
    `ProtectedRoute`, two-way redirects, username and logout in the navbar.
 
 **Phase 2 - Discover**
@@ -197,6 +198,11 @@ error handler. No stack traces, Mongo errors or secrets in responses.
 
 ## Auth design
 
+- Login uses email and password, not username.
+- Account rules, enforced by the server and mirrored by the forms: username 3-30
+  letters, numbers, hyphens or underscores, case-sensitive; email a valid address
+  of at most 254 characters, stored lowercase; password at least 8 characters and
+  at most 72 bytes (bcrypt ignores anything longer), no composition rules.
 - JWT `{ sub: userId }`, 7-day expiry, signed on register and login.
 - Cookie `token`: `httpOnly`, `sameSite: "lax"`, `secure` in production,
   `maxAge` 7 days.

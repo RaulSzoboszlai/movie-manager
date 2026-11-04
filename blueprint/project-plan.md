@@ -157,6 +157,11 @@ TMDB's `/search/movie` endpoint can filter by year but not by genre. The server 
 An `AuthContext` loads `/auth/me` when the app starts. A `ProtectedRoute` component redirects to `/login` when there is no user.
 
 ## Auth design
+- Users log in with their email and password, not their username.
+- Account rules, enforced by the server and mirrored by the forms:
+  - username: 3-30 letters, numbers, hyphens or underscores, case-sensitive (`Raul` and `raul` are different accounts)
+  - email: a valid address of at most 254 characters, stored lowercase
+  - password: at least 8 characters and at most 72 bytes (bcrypt ignores anything longer), with no composition rules
 - Passwords are hashed with bcryptjs (cost 10) and never returned by the API.
 - On login or register, the server signs a JWT `{ sub: userId }` that expires in 7 days.
 - The JWT is set as cookie `token` with these options:

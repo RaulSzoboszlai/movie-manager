@@ -3,8 +3,9 @@ import cors from 'cors';
 import express from 'express';
 import mongoose from 'mongoose';
 import { errorHandler, notFound } from './middleware/errorHandler.js';
+import authRoutes from './routes/auth.js';
 
-const missing = ['MONGO_URI', 'CLIENT_URL'].filter((name) => !process.env[name]);
+const missing = ['MONGO_URI', 'CLIENT_URL', 'JWT_SECRET'].filter((name) => !process.env[name]);
 if (missing.length > 0) {
     console.error(
         `Missing required environment variables: ${missing.join(', ')}. ` +
@@ -26,6 +27,8 @@ app.use(cookieParser());
 app.get('/api/health', (req, res) => {
     res.json({ status: 'ok' });
 });
+
+app.use('/api/auth', authRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

@@ -15,10 +15,10 @@
 **Suggested fix:** Delete client/README.md or replace it with a line pointing at the root README. No current requirement would be lost.
 **Resolution:**
 
-### F-02 [P3] open - Coding standards TODO describes starter files this feature removed
+### F-04 [P3] unverified - Form alert may not be announced when it stops being display:none
 
-**File:** blueprint/context/coding-standards.md:102
-**Found:** 2026-11-04 by /audit independent (scope: current; lens: quality)
-**Why it matters:** The TODO says the scaffold still ships client/src/App.css and the Vite starter markup, and that dark/light handling is undecided. This feature deleted both and the spec records that there is no theme toggle, so the standards file now misstates the code.
-**Suggested fix:** Remove the TODO. No current requirement would be lost.
+**File:** client/src/pages/LoginPage.jsx:24
+**Found:** 2026-11-04 by /audit (scope: current; lens: quality)
+**Why it matters:** The `role="alert"` element stays mounted, which helps announcements, but `empty:hidden` removes it from the accessibility tree until text arrives. Some browser and screen reader pairs announce a live region unreliably when it becomes visible and gains content in one update. The same markup is in RegisterPage.jsx:24. The DOM and visible text were checked in Chrome, but no screen reader was run, so this is a lead and not a confirmed defect.
+**Suggested fix:** Test the failed-login message with NVDA or Narrator. If it is not announced, remove `empty:hidden` and drop the empty element's spacing another way. No current requirement would be lost.
 **Resolution:**

@@ -7,12 +7,13 @@ Each item below is one Blueprint feature loop: `/feature` → `/implement` → `
   - Express server with `/api/health`, MongoDB connection, central error handler, CORS and cookie-parser.
   - React Router with a layout: navbar, footer with TMDB attribution, and placeholder pages for every route.
   - A 404 page.
-- [ ] **2. Register & login**
+- [x] **2. Register & login**
   - User model, plus register, login and logout endpoints.
   - Passwords hashed with bcryptjs; JWT stored in an httpOnly cookie.
   - Login and Register forms with validation and error messages.
 - [ ] **3. Session & protected routes**
   - `GET /auth/me` and `requireAuth` middleware.
+  - Put `requireAuth` on `POST /auth/logout`, which Feature 2 ships unguarded.
   - `AuthContext` on the client, `ProtectedRoute`, and redirects in both directions.
   - Navbar shows the username and a logout button.
 
