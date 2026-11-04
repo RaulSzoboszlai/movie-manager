@@ -18,13 +18,14 @@ Each item below is one Blueprint feature loop: `/feature` → `/implement` → `
 
 ## Phase 2 — Discover
 - [ ] **4. TMDB service + Top 10 trending**
-  - `services/tmdb.js` wrapper and `GET /movies/trending`.
+  - `services/tmdb.js` wrapper, including a cached genre list (id → name).
+  - `GET /movies/trending`.
   - The home page shows a responsive grid of 10 `MovieCard`s.
 - [ ] **5. Search**
   - `GET /movies/search` and a search page with a debounced input.
   - Results grid, pagination ("Load more"), and the query kept in the URL.
 - [ ] **6. Search filters**
-  - `GET /movies/genres`, plus genre and year selects.
+  - `GET /movies/genres`, served from the cached genre list, plus genre and year selects.
   - Server-side filter logic: search vs. discover (see the note in the project plan).
 - [ ] **7. Movie details page**
   - `GET /movies/:tmdbId` using `append_to_response=credits,videos`.
@@ -35,7 +36,8 @@ Each item below is one Blueprint feature loop: `/feature` → `/implement` → `
 
 ## Phase 3 — My library
 - [ ] **9. Watchlist**
-  - SavedMovie model; add to and remove from the watchlist.
+  - SavedMovie model, with a snapshot that includes `genreIds[]`.
+  - Add to and remove from the watchlist, from any card or the details page.
   - The watchlist button on cards and the details page reflects the saved state.
   - Library page with the *Want to watch* tab.
 - [ ] **10. Watched & rating**
@@ -52,6 +54,7 @@ Each item below is one Blueprint feature loop: `/feature` → `/implement` → `
   - Remove a movie from a list.
 - [ ] **13. Profile stats**
   - `GET /profile/stats` using a MongoDB aggregation.
+  - Top genres are counted by `genreIds`, then turned into names with the cached genre list.
   - Profile page with stat cards and the rating distribution.
 
 ## Phase 5 — Polish

@@ -1,6 +1,6 @@
 # Movie Manager - Project Overview
 
-<!-- blueprint:source-hash 7f180989a199ffedfcbe73a724de886d01a881cbc22172e35a9e2a880645f4ed -->
+<!-- blueprint:source-hash e2d95d570a63341c5cc7316d195f16578d776b324df4996e6f44b5402aa146f9 -->
 
 > A private movie tracker: search TMDB, keep a watchlist, rate what you watched,
 > and organise films into your own lists.
@@ -43,13 +43,13 @@ In `build-plan.md` order. One Blueprint feature loop each.
 
 **Phase 2 - Discover**
 
-4. **TMDB service + Top 10 trending** - `services/tmdb.js` wrapper and
-   `GET /movies/trending`; home page grid of 10 `MovieCard`s. This is the
-   headline feature: the app's front door.
+4. **TMDB service + Top 10 trending** - `services/tmdb.js` wrapper including the
+   cached genre list (id to name), plus `GET /movies/trending`; home page grid of
+   10 `MovieCard`s. This is the headline feature: the app's front door.
 5. **Search** - `GET /movies/search`, debounced input, results grid, Load more
    pagination, query kept in the URL.
-6. **Search filters** - `GET /movies/genres` plus genre and year selects, with
-   the server-side search-vs-discover split below.
+6. **Search filters** - `GET /movies/genres` served from the cached genre list,
+   plus genre and year selects, with the search-vs-discover split below.
 7. **Movie details page** - `GET /movies/:tmdbId` with
    `append_to_response=credits,videos`; backdrop, overview, cast row, YouTube
    trailer embed.
@@ -58,8 +58,9 @@ In `build-plan.md` order. One Blueprint feature loop each.
 
 **Phase 3 - My library**
 
-9. **Watchlist** - SavedMovie model, add and remove, saved state reflected on
-   cards and details, library *Want to watch* tab.
+9. **Watchlist** - SavedMovie model with a snapshot that includes `genreIds[]`;
+   add and remove from any card or the details page; saved state reflected on
+   cards and details; library *Want to watch* tab.
 10. **Watched & rating** - `PATCH /library/:tmdbId` to mark watched (records
     `watchedAt`) and to set or clear a rating; star component enabled only once
     watched; *Watched* tab.
@@ -69,8 +70,9 @@ In `build-plan.md` order. One Blueprint feature loop each.
 11. **Custom lists** - List model and CRUD, lists page, list detail page with
     rename.
 12. **Add to list** - "Add to list" menu on cards and details, plus removal.
-13. **Profile stats** - `GET /profile/stats` via a Mongo aggregation; stat cards
-    and rating distribution.
+13. **Profile stats** - `GET /profile/stats` via a Mongo aggregation; top genres
+    counted by `genreIds` then named from the cached genre list; stat cards and
+    rating distribution.
 
 **Phase 5 - Polish**
 
@@ -83,6 +85,16 @@ Explicitly out of scope for v1: social features (following, public or shared
 lists, comments), written reviews, password reset by email, OAuth, TV shows, and
 an admin panel. The build plan's "Later (not V1)" backlog is a parking lot, not
 committed scope.
+
+## Decisions settled for v1
+
+Recorded so they are not reopened mid-build.
+
+- **No separate favorites flag.** The watchlist covers it; no heart icon. A
+  favorites toggle sits under "Later".
+- **Ratings are 1-5 whole stars.** Half stars sit under "Later".
+- **Genres are snapshotted as TMDB ids**, resolved to names through the cached
+  genre list.
 
 ## Data model
 
@@ -107,7 +119,7 @@ One document per user and movie. This is the library.
 - `title` (String) - snapshot
 - `posterPath` (String) - snapshot
 - `releaseYear` (Number) - snapshot
-- `genres` (Array) - snapshot, used by profile stats
+- `genreIds` (Array of Number) - snapshot of TMDB genre ids; feeds profile stats
 - `status` (String enum `"want" | "watched"`, required)
 - `rating` (Number 1-5 or null) - allowed only when `status` is `"watched"`
 - `watchedAt` (Date) - set when status becomes `"watched"`
@@ -125,12 +137,26 @@ One document per user and movie. This is the library.
 
 > Locked shapes. Feature 9 depends on the SavedMovie index and the
 > `status`/`rating` pairing; feature 10 on `watchedAt` and the 1-5 rating;
-> feature 13 aggregates over `status`, `rating` and `genres`; feature 12 on the
+> feature 13 aggregates over `status`, `rating` and `genreIds`; feature 12 on the
 > embedded `List.movies` item shape. Changing any of these later means a
 > migration, so settle them in features 9 and 11.
 
 List membership is independent of library status: a movie can sit in several
 lists and also be `watched`.
+
+### Genre ids, not names
+
+TMDB's trending, search, discover and similar payloads carry only `genre_ids`;
+only the details endpoint returns full `{ id, name }` objects. Storing ids lets a
+movie be saved from any card without a second TMDB call.
+
+- **Resolution:** `services/tmdb.js` fetches `/genre/movie/list` once and caches
+  the id-to-name map in memory (feature 4).
+- **Consumers:** `GET /movies/genres` for the search filter, and
+  `GET /profile/stats` for top genres.
+- **Client contract:** when adding to the library, the client sends `genreIds`
+  from whatever payload it holds. On the details page that means the ids pulled
+  from `genres[].id`.
 
 ## API
 
@@ -179,24 +205,30 @@ error handler. No stack traces, Mongo errors or secrets in responses.
 
 ## Tech stack
 
-- **JavaScript, ES modules** - both packages, no TypeScript
+- **JavaScript, ES modules** - every package, no TypeScript
 - **React + Vite (`.jsx`)** - client, with React Router for routing
-- **Tailwind CSS v4 via `@tailwindcss/vite`** - styling, CSS-first config
+- **Tailwind CSS v4 via `@tailwindcss/vite`** - all styling, CSS-first config
 - **Axios** - client HTTP, one configured instance
-- **Node.js 22+ and Express** - API
+- **Node.js 22+ and Express** - API; `>=22` declared in `engines` in every
+  `package.json`
 - **Mongoose** - MongoDB access (local or Atlas)
 - **bcryptjs + jsonwebtoken + cookie-parser** - auth
 - **TMDB API** - all movie data, server-side only so the key stays secret
-- **Oxlint** - linting, client and server
+- **Oxlint** - linting, `npm run lint` in each package
 - **`node --watch --env-file=.env`** - server dev loop
+- **concurrently** - root-only dev dependency that runs both halves
 
-**Tooling rules (hard constraints).** Tailwind v4 is configured in CSS only
-(`@import "tailwindcss"` plus `@theme`): never add `tailwind.config.js` or
-`postcss.config.js`. Env vars load through Node's `--env-file`: do not add
+**Repo layout.** A monorepo: `client/` and `server/`, each with its own
+`package.json`, plus a small root `package.json` whose only dev dependency is
+`concurrently`. Root `npm run dev` starts both halves; root `npm run lint` lints
+both. Either half also runs on its own from its own folder. In development Vite
+proxies `/api` to `http://localhost:5000`.
+
+**Tooling rules (hard constraints).** Tailwind v4 is configured in CSS only:
+`@import "tailwindcss"` in `client/src/index.css`, theme customization through
+`@theme`. Never add the v3 files `tailwind.config.js` or `postcss.config.js`; v4
+does not need them. Env vars load through Node's `--env-file`: do not add
 `dotenv` or `nodemon`. Lint with Oxlint only: do not add ESLint.
-
-**Repo layout.** `client/` and `server/`, with Vite proxying `/api` to
-`http://localhost:5000` in development.
 
 ## Monetization
 
@@ -225,9 +257,9 @@ terms require.
 
 ## Deployment
 
-> TODO: not decided. The build plan's optional feature 15 names API on Render,
-> MongoDB Atlas and client on Vercel as an example only, and the project plan has
-> no deployment section. Settle the target before running `/release`.
+> TODO: target not decided. The build plan's optional feature 15 names API on
+> Render, MongoDB Atlas and client on Vercel as an example only, and the project
+> plan has no deployment section. Settle this before running `/release`.
 
 What is already fixed:
 
@@ -235,30 +267,14 @@ What is already fixed:
   `CLIENT_URL`, `NODE_ENV`
 - Client build: `npm run build` in `client/`, output `client/dist/`
 - Server start: `npm start` in `server/` (`node src/index.js`), no build step
+- Node 22+ required at every level
 - Health path: `GET /api/health`
 - Cookies need `secure`, and the deployed `CLIENT_URL` drives CORS
 - No workers or cron jobs
 
 ## Open questions
 
-> Resolve these in the plans, then re-run `/overview`.
-
-- **Root `npm run dev` with `concurrently` does not exist.** The project plan
-  describes a monorepo whose root script starts both halves, but there is no root
-  `package.json` and `concurrently` is not installed. `AGENTS.md` currently
-  documents running each package separately. Either add the root runner as part
-  of feature 1 or drop it from the plan.
-- **`dotenv` contradicts the tooling rule.** The plan says not to add `dotenv`,
-  but `server/package.json` already depends on it (unused in `src/index.js`).
-  Remove the dependency, or amend the rule.
-- **Oxlint is client-only today.** The plan calls for Oxlint on client and
-  server, but `server/package.json` has no `lint` script and no oxlint
-  dependency. Add it, or narrow the plan.
-- **Node 22+ is unenforced.** Neither package declares an `engines` field.
-- **Genre snapshots.** Profile stats rank genres from `SavedMovie.genres`, but
-  TMDB's trending and search payloads carry `genre_ids`, not names; only the
-  details endpoint returns full genre objects. Feature 9 needs to decide whether
-  to store ids, resolve names against `/movies/genres`, or fetch details on add.
-- Settled v1 defaults, recorded so they are not reopened: the watchlist covers
-  what a separate favorites flag would (no heart icon), and ratings are 1-5 whole
-  stars.
+- **In-memory genre cache lifetime.** `services/tmdb.js` caches TMDB's genre
+  list in memory with no stated refresh or failure behavior. Feature 4 should
+  decide what happens when the fetch fails at startup and whether the cache ever
+  refreshes; a stale map would mislabel genres on `/profile/stats`.

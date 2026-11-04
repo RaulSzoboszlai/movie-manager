@@ -1,0 +1,25 @@
+{
+  "name": "movie-manager",
+  "version": "1.0.0",
+  "description": "A personal movie collection and watchlist app. React single-page client, Express API, MongoDB.",
+  "main": "index.js",
+  "engines": { "node": ">=22" },
+  "scripts": {
+  "dev": "concurrently -n server,client -c blue,green \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
+  "lint": "npm run lint --prefix client && npm run lint --prefix server"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RaulSzoboszlai/movie-manager.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/RaulSzoboszlai/movie-manager/issues"
+  },
+  "homepage": "https://github.com/RaulSzoboszlai/movie-manager#readme",
+  "devDependencies": {
+    "concurrently": "^10.0.6"
+  }
+}

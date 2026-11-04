@@ -64,17 +64,21 @@ Shows the user's stats:
 |---|---|
 | Language | **JavaScript** everywhere (no TypeScript), ES modules (`import`/`export`) on both client and server |
 | Frontend | React + Vite (`.jsx`), React Router, Tailwind CSS v4 via `@tailwindcss/vite`, Axios |
-| Backend | Node.js 22+, Express, Mongoose |
+| Backend | Node.js 22+ (declared in `engines` in every `package.json`), Express, Mongoose |
 | Database | MongoDB (local, or MongoDB Atlas) |
 | Auth | bcryptjs password hashing + JWT in an httpOnly cookie |
 | Movie data | TMDB API, always called from the server so the API key stays secret |
-| Linting | Oxlint on client and server |
+| Linting | Oxlint on client and server (`npm run lint` in each package) |
 | Dev tooling | Server: `node --watch --env-file=.env` (no nodemon). Client: Vite dev server. |
 
-**Repo layout:** a monorepo with `client/` and `server/` folders. The root `npm run dev` starts both with `concurrently`. In development, Vite proxies `/api` to `http://localhost:5000`.
+**Repo layout:** a monorepo with `client/` and `server/` folders, each with its own `package.json`. A small root `package.json` has only `concurrently` as a dev dependency, plus scripts:
+- `npm run dev` starts both halves.
+- `npm run lint` lints both halves.
+
+Each half can also run on its own from its own folder. In development, Vite proxies `/api` to `http://localhost:5000`.
 
 **Tooling rules:**
-- Tailwind v4 is configured in CSS only: `@import "tailwindcss";`, with customization through `@theme`. Never add `tailwind.config.js` or `postcss.config.js`.
+- **Tailwind CSS v4 is used for all styling.** It is set up with the `@tailwindcss/vite` plugin and `@import "tailwindcss";` in `client/src/index.css`. Customize the theme with `@theme` in CSS. Don't add the old v3 files (`tailwind.config.js`, `postcss.config.js`), because v4 doesn't need them.
 - Environment variables are loaded by Node's `--env-file` in development. Don't add `dotenv` or `nodemon`.
 - Lint with Oxlint only. Don't add ESLint.
 
@@ -89,7 +93,7 @@ Shows the user's stats:
 **SavedMovie** — one document per user + movie
 - `user` (ref User)
 - `tmdbId`
-- a snapshot of: `title`, `posterPath`, `releaseYear`, `genres[]`
+- a snapshot of: `title`, `posterPath`, `releaseYear`, `genreIds[]` (TMDB genre ids as numbers)
 - `status`: `"want"` or `"watched"`
 - `rating`: 1–5 or null; allowed only when status is `"watched"`
 - `watchedAt`
@@ -105,6 +109,11 @@ Shows the user's stats:
 - unique index on `{ user, name }`
 
 The SavedMovie and List items store a small snapshot of each movie. This lets library and list pages render without calling TMDB for every movie.
+
+**Genres are stored as ids, not names.** TMDB's trending, search, discover and similar payloads include only `genre_ids`; just the details endpoint returns full `{ id, name }` objects. Storing ids means a movie can be saved from any card without an extra TMDB call.
+- **Converting ids to names:** `services/tmdb.js` fetches TMDB's movie genre list (`/genre/movie/list`) once and caches it in memory.
+- **Who uses it:** `GET /movies/genres` (the search filter) and `GET /profile/stats` (top genres).
+- **What the client sends:** when adding to the library, the client sends `genreIds` from whatever payload it has. On the details page, that means the ids taken from `genres[].id`.
 
 ## API (all under `/api`)
 
@@ -168,6 +177,7 @@ An `AuthContext` loads `/auth/me` when the app starts. A `ProtectedRoute` compon
 - The UI is mobile-first and responsive with Tailwind. Every data view has loading, empty and error states.
 - The footer shows the TMDB attribution notice, which TMDB's API terms require.
 
-## Open questions
-- Should "favorite" be its own flag (a heart icon), or is the watchlist enough? *Default for v1: the watchlist is enough.*
-- Should ratings be 1–5 whole stars, or allow half stars / 1–10? *Default for v1: 1–5 whole stars.*
+## Decisions (settled for v1)
+- **No separate favorites flag.** The watchlist covers it, so there's no heart icon. A favorites toggle is listed under "Later" in the build plan.
+- **Ratings are 1–5 whole stars.** Half stars are listed under "Later".
+- **Genres are snapshotted as TMDB ids** and turned into names through a cached genre list (see Data model).
