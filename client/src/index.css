@@ -19,9 +19,18 @@
   --color-error: #ff6b6b;
   --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --radius-card: 10px;
+  --shadow-lift: 0 12px 28px rgba(0, 0, 0, 0.55);
 }
 
 @layer base {
+  :root {
+    --poster-width: clamp(8rem, 15vw, 12rem);
+    --rank-size: calc(var(--poster-width) * 1.06);
+    --rank-offset: calc(var(--poster-width) * 0.43);
+    /* Wider so the two-digit "10" keeps the same numeral size. */
+    --rank-offset-wide: calc(var(--poster-width) * 0.98);
+  }
+
   body {
     background-color: var(--color-bg);
     color: var(--color-text);

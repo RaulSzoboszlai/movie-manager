@@ -22,6 +22,7 @@
 
 ### Discover
 - **Top 10 of the moment:** the home page shows the top 10 movies from TMDB's weekly trending list.
+- **Home page rows:** under the Top 10, rows such as *Popular*, *Top rated* and *Upcoming*, using regular movie cards.
 - **Search:** search movies by title, with optional **genre** and **release year** filters.
 - **Movie details page:**
   - poster, backdrop, overview, runtime, release date and genres
@@ -146,7 +147,7 @@ TMDB's `/search/movie` endpoint can filter by year but not by genre. The server 
 | Route | Page | Access |
 |---|---|---|
 | `/login`, `/register` | Auth forms | public; redirect to `/` if already logged in |
-| `/` | Home: Top 10 trending | protected |
+| `/` | Home: Top 10 trending, then more movie rows | protected |
 | `/search` | Search + filters, state kept in the URL query | protected |
 | `/movie/:tmdbId` | Movie details + similar movies | protected |
 | `/library` | Want to watch / Watched tabs | protected |

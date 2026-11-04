@@ -30,3 +30,11 @@
 **Why it matters:** `retrySession` sets `loading` first (client/src/context/AuthContext.jsx:79), so the guard swaps the error block for the status text and React removes the focused "Try again" button (ProtectedRoute.jsx:23). Focus falls back to the document body. If the check fails again during an outage, a keyboard user has to Tab back through the navbar for each retry. This follows the spec's state table and is not a route change, so Feature 14's route-focus work does not obviously cover it. Found by reading the code path, not run in a browser.
 **Suggested fix:** Move focus to the new "Try again" button when the guard re-enters `error` after a retry, or keep the button mounted with `aria-disabled` during the retry. No current requirement would be lost.
 **Resolution:**
+
+### F-06 [P3] open - Overview still lists the genre cache lifetime as an open question
+
+**File:** blueprint/context/project-overview.md:307
+**Found:** 2026-11-04 by /audit independent (scope: current; lens: quality)
+**Why it matters:** The spec's Genre cache section says it answers this question and server/src/services/tmdb.js:73 implements the decision, but the delta leaves the overview entry in place. It still says Feature 4 should decide, and it assumes a fetch at startup, which the lazy design rules out. The overview is the project's source of truth, and Features 6 and 13 consume this cache, so they could reopen a settled decision. No runtime effect.
+**Suggested fix:** Remove the bullet from Open questions and record the lazy fetch, uncached failure and process-lifetime cache under "Genre ids, not names", through the project's normal overview path. No current requirement would be lost.
+**Resolution:** Re-examined by /audit independent at 41b8347 and still open. The bullet moved from line 302 to line 307 because the delta added plan lines above it. The code reference is unchanged.

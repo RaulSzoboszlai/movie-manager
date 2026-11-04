@@ -1,6 +1,6 @@
 # Movie Manager - Project Overview
 
-<!-- blueprint:source-hash 145996a8da421f7a300c1f9c75ee5c5cc17f5e1d8b8d55fcb59d059356519966 -->
+<!-- blueprint:source-hash 447199f4f3de5bf38dd9be7c92a5da1bc413e2aa573f9a6371dad23fb0c9d2ab -->
 
 > A private movie tracker: search TMDB, keep a watchlist, rate what you watched,
 > and organise films into your own lists.
@@ -49,6 +49,9 @@ In `build-plan.md` order. One Blueprint feature loop each.
    `MovieCard`s in one sideways-scrolling row with rank numbers behind the posters.
    This is the headline feature: the app's front door. `prototypes/` is deleted
    when this feature completes.
+4a. **Home page rows** - rows such as *Popular*, *Top rated* and *Upcoming* under
+   the Top 10, using regular movie cards. The home page stops being vertically
+   centered.
 5. **Search** - `GET /movies/search`, debounced input, results grid, Load more
    pagination, query kept in the URL.
 6. **Search filters** - `GET /movies/genres` served from the cached genre list,
@@ -188,6 +191,8 @@ cookie.
 
 Feature 1 also adds `GET /api/health` for the app shell.
 
+> TODO: the endpoints for the home page rows (feature 4a) are not in the plans yet.
+
 **Search filter workaround.** TMDB's `/search/movie` filters by year but not by
 genre, so the server branches: with a text query it searches and filters results
 by genre; without one it calls `/discover/movie` with genre and year. Feature 6
@@ -252,7 +257,7 @@ terms require.
 | Route | Page | Access |
 | --- | --- | --- |
 | `/login`, `/register` | Auth forms | public; redirect to `/` when signed in |
-| `/` | Home: Top 10 trending | protected |
+| `/` | Home: Top 10 trending, then more movie rows | protected |
 | `/search` | Search and filters, state in the URL query | protected |
 | `/movie/:tmdbId` | Details plus similar movies | protected |
 | `/library` | *Want to watch* / *Watched* tabs | protected |
