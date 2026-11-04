@@ -86,9 +86,15 @@ Skills: `adopt`, `audit`, `blueprint-doctor`, `blueprint-status`, `brief`,
 
 ## Commands
 
-Two npm packages, each with its own `package.json` and lockfile. There is no
-root manifest and no workspace wiring, so run commands from `client/` or
-`server/`. Install with `npm install` in each.
+A monorepo with `client/` and `server/`, each with its own `package.json` and
+lockfile, plus a small root `package.json` that only holds `concurrently` and the
+scripts below. There is no workspace wiring, so run `npm install` in the root,
+`client/`, and `server/`.
+
+Root:
+
+- Dev servers: `npm run dev` (starts server and client with `concurrently`)
+- Lint: `npm run lint` (lints client, then server)
 
 Client (`client/`, React + Vite):
 
@@ -101,7 +107,8 @@ Server (`server/`, Express + Mongoose):
 
 - Dev server: `npm run dev` (http://localhost:5000, `node --watch`, loads `.env`)
 - Production server: `npm start`
-- No build step, no lint command configured
+- Lint: `npm run lint` (oxlint on `src`)
+- No build step
 
 There is no test command in either package, so **tests are not a gate yet**.
 `server/package.json` has a placeholder `test` script that only exits 1; it does
