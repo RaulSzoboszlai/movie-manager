@@ -20,7 +20,8 @@ Each item below is one Blueprint feature loop: `/feature` → `/implement` → `
 - [ ] **4. TMDB service + Top 10 trending**
   - `services/tmdb.js` wrapper, including a cached genre list (id → name).
   - `GET /movies/trending`.
-  - The home page shows a responsive grid of 10 `MovieCard`s.
+  - The home page shows the 10 `MovieCard`s in a single row that scrolls sideways, with large outlined rank numbers behind the posters (see `prototypes/home.html` and Visual direction in the project plan).
+  - `prototypes/` is deleted when this feature completes.
 - [ ] **5. Search**
   - `GET /movies/search` and a search page with a debounced input.
   - Results grid, pagination ("Load more"), and the query kept in the URL.

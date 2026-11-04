@@ -1,6 +1,6 @@
 # Movie Manager - Project Overview
 
-<!-- blueprint:source-hash e2d95d570a63341c5cc7316d195f16578d776b324df4996e6f44b5402aa146f9 -->
+<!-- blueprint:source-hash 49a0d06b90721823d24fc1bd50595981a1ca9ea156b18960569d93ee432739ca -->
 
 > A private movie tracker: search TMDB, keep a watchlist, rate what you watched,
 > and organise films into your own lists.
@@ -44,8 +44,10 @@ In `build-plan.md` order. One Blueprint feature loop each.
 **Phase 2 - Discover**
 
 4. **TMDB service + Top 10 trending** - `services/tmdb.js` wrapper including the
-   cached genre list (id to name), plus `GET /movies/trending`; home page grid of
-   10 `MovieCard`s. This is the headline feature: the app's front door.
+   cached genre list (id to name), plus `GET /movies/trending`; home page shows 10
+   `MovieCard`s in one sideways-scrolling row with rank numbers behind the posters.
+   This is the headline feature: the app's front door. `prototypes/` is deleted
+   when this feature completes.
 5. **Search** - `GET /movies/search`, debounced input, results grid, Load more
    pagination, query kept in the URL.
 6. **Search filters** - `GET /movies/genres` served from the cached genre list,
@@ -254,6 +256,23 @@ terms require.
 
 `AuthContext` loads `/auth/me` at startup; `ProtectedRoute` redirects to
 `/login` when there is no user.
+
+## Visual direction
+
+Dark and cinematic, so posters stand out. Inter throughout (400, 500, 700, 900) with a system sans fallback.
+
+| Role | Value |
+| --- | --- |
+| Page, surface, raised surface | `#080b12`, `#111622`, `#1a2130` |
+| Border, stronger border | `#262e3f`, `#43506a` |
+| Text, muted text | `#f1f4f9`, `#a4aec2` |
+| Blue accent, hover, text on accent, soft tint | `#4da3ff`, `#7dbcff`, `#06121f`, `rgba(77, 163, 255, 0.16)` |
+| Watched, soft tint | `#5fd39a`, `rgba(95, 211, 154, 0.14)` |
+| Error | `#ff6b6b` |
+| Stars, filled and empty | gold `#f5b301`, `#56607a` |
+
+- **Movie cards:** 2:3 poster with a thin border and 10px corners, then title and year, then the watchlist button or watched state with stars. Hover lifts the poster; the focus ring sits on the poster.
+- **Top 10 row:** one sideways-scrolling row, never a grid. A huge outlined rank number in the page color stands behind the left edge of each poster, and its outline turns blue on hover. All numbers are the same size, so the "10" card is wider. Titles and buttons line up under the poster. Only the row scrolls, never the page.
 
 ## Deployment
 

@@ -171,6 +171,21 @@ An `AuthContext` loads `/auth/me` when the app starts. A `ProtectedRoute` compon
 ## Environment variables (`server/.env`)
 `PORT`, `MONGO_URI`, `JWT_SECRET`, `TMDB_API_KEY`, `CLIENT_URL`, `NODE_ENV`
 
+## Visual direction
+The look was chosen with a prototype, and this section keeps it after the prototype is deleted.
+- **Mood:** dark and cinematic, so posters stand out.
+- **Palette:**
+  - backgrounds: page `#080b12`, surface `#111622`, raised surface `#1a2130`
+  - borders: `#262e3f`, stronger `#43506a`
+  - text: primary `#f1f4f9`, muted `#a4aec2`
+  - blue accent for primary actions, the active nav link, the logo and focus rings: `#4da3ff`, hover `#7dbcff`, text on accent `#06121f`, soft tint `rgba(77, 163, 255, 0.16)`
+  - watched state: green `#5fd39a`, soft tint `rgba(95, 211, 154, 0.14)`
+  - error: `#ff6b6b`
+- **Stars:** gold `#f5b301` when filled, `#56607a` when empty. Stars stay gold even though the accent is blue.
+- **Font:** Inter for everything (weights 400, 500, 700 and 900), falling back to the system sans.
+- **Movie cards:** a 2:3 poster with a thin border and 10px corners, then the title and year, then the watchlist button or the watched state with stars. On hover the poster lifts slightly. The keyboard focus ring sits on the poster.
+- **Top 10 row:** one row that scrolls sideways, not a grid. Each card has a huge outlined rank number in the page color, standing behind the left edge of the poster, with the poster covering part of it. The outline turns blue on hover. All numbers are the same size, so the "10" card is wider. Titles and buttons line up under the poster. Only the row scrolls, never the page.
+
 ## Conventions
 - Server code is split into `routes/` → `controllers/` → `models/`, plus `middleware/` and a `services/tmdb.js` wrapper.
 - Errors come back as JSON `{ message }` with the right status code, through a central error handler.
