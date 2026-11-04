@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
-import { useNavigate } from 'react-router-dom'
 
 const FALLBACK_MESSAGE = 'Something went wrong. Please try again.'
 
@@ -11,7 +10,6 @@ function readServerMessage(err) {
 }
 
 function useAuthForm({ initialValues, validate, submit }) {
-  const navigate = useNavigate()
   const [values, setValues] = useState(initialValues)
   const [errors, setErrors] = useState({})
   const [formError, setFormError] = useState('')
@@ -49,7 +47,6 @@ function useAuthForm({ initialValues, validate, submit }) {
     setPending(true)
     try {
       await submit(values)
-      navigate('/', { replace: true })
     } catch (err) {
       setFormError(readServerMessage(err))
       setPending(false)

@@ -11,7 +11,7 @@ Each item below is one Blueprint feature loop: `/feature` → `/implement` → `
   - User model, plus register, login and logout endpoints.
   - Passwords hashed with bcryptjs; JWT stored in an httpOnly cookie.
   - Login and Register forms with validation and error messages.
-- [ ] **3. Session & protected routes**
+- [x] **3. Session & protected routes**
   - `GET /auth/me` and `requireAuth` middleware.
   - Put `requireAuth` on `POST /auth/logout`, which Feature 2 ships unguarded.
   - `AuthContext` on the client, `ProtectedRoute`, and redirects in both directions.

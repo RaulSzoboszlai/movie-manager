@@ -1,3 +1,7 @@
+export function httpError(status, message) {
+    return Object.assign(new Error(message), { status });
+}
+
 export function notFound(req, res) {
     res.status(404).json({ message: 'Not found' });
 }

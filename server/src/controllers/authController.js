@@ -1,5 +1,6 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { httpError } from '../middleware/errorHandler.js';
 import User from '../models/User.js';
 
 const { JWT_SECRET, NODE_ENV } = process.env;
@@ -19,10 +20,6 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const EMAIL_MAX_LENGTH = 254;
 const PASSWORD_MIN_LENGTH = 8;
 const PASSWORD_MAX_BYTES = 72;
-
-function httpError(status, message) {
-    return Object.assign(new Error(message), { status });
-}
 
 function normalizeEmail(email) {
     return typeof email === 'string' ? email.trim().toLowerCase() : '';
@@ -98,6 +95,15 @@ export async function login(req, res) {
     }
 
     setAuthCookie(res, user);
+    res.json({ user: toPublicUser(user) });
+}
+
+export async function me(req, res) {
+    const user = await User.findById(req.userId);
+    if (!user) {
+        throw httpError(401, 'Not authenticated');
+    }
+
     res.json({ user: toPublicUser(user) });
 }
 

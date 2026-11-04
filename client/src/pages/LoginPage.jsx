@@ -1,16 +1,17 @@
 import { Link } from 'react-router-dom'
 import FormField from '../components/auth/FormField.jsx'
+import useAuth from '../hooks/useAuth.js'
 import useAuthForm from '../hooks/useAuthForm.js'
-import api from '../lib/api.js'
 import { validateLogin } from '../lib/authValidation.js'
 
 const INITIAL_VALUES = { email: '', password: '' }
 
 function LoginPage() {
+  const { login } = useAuth()
   const { values, errors, formError, pending, handleChange, handleSubmit } = useAuthForm({
     initialValues: INITIAL_VALUES,
     validate: validateLogin,
-    submit: (body) => api.post('/auth/login', body),
+    submit: login,
   })
 
   return (

@@ -17,8 +17,16 @@
 
 ### F-04 [P3] unverified - Form alert may not be announced when it stops being display:none
 
-**File:** client/src/pages/LoginPage.jsx:24
+**File:** client/src/pages/LoginPage.jsx:25
 **Found:** 2026-11-04 by /audit (scope: current; lens: quality)
-**Why it matters:** The `role="alert"` element stays mounted, which helps announcements, but `empty:hidden` removes it from the accessibility tree until text arrives. Some browser and screen reader pairs announce a live region unreliably when it becomes visible and gains content in one update. The same markup is in RegisterPage.jsx:24. The DOM and visible text were checked in Chrome, but no screen reader was run, so this is a lead and not a confirmed defect.
+**Why it matters:** The `role="alert"` element stays mounted, which helps announcements, but `empty:hidden` removes it from the accessibility tree until text arrives. Some browser and screen reader pairs announce a live region unreliably when it becomes visible and gains content in one update. The same markup is in RegisterPage.jsx:25. The DOM and visible text were checked in Chrome, but no screen reader was run, so this is a lead and not a confirmed defect.
 **Suggested fix:** Test the failed-login message with NVDA or Narrator. If it is not announced, remove `empty:hidden` and drop the empty element's spacing another way. No current requirement would be lost.
+**Resolution:** Re-examined by /audit independent at c006fba and still unverified, since no screen reader was run. The delta moved the lines above by one and adds the same pattern to the logout error at client/src/components/layout/AccountNav.jsx:59, so any test should cover that region too.
+
+### F-05 [P3] open - "Try again" drops keyboard focus on every session retry
+
+**File:** client/src/components/auth/ProtectedRoute.jsx:7
+**Found:** 2026-11-04 by /audit independent (scope: current; lens: quality)
+**Why it matters:** `retrySession` sets `loading` first (client/src/context/AuthContext.jsx:79), so the guard swaps the error block for the status text and React removes the focused "Try again" button (ProtectedRoute.jsx:23). Focus falls back to the document body. If the check fails again during an outage, a keyboard user has to Tab back through the navbar for each retry. This follows the spec's state table and is not a route change, so Feature 14's route-focus work does not obviously cover it. Found by reading the code path, not run in a browser.
+**Suggested fix:** Move focus to the new "Try again" button when the guard re-enters `error` after a retry, or keep the button mounted with `aria-disabled` during the retry. No current requirement would be lost.
 **Resolution:**

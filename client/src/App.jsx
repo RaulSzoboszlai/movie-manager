@@ -1,4 +1,6 @@
 import { Route, Routes } from 'react-router-dom'
+import ProtectedRoute from './components/auth/ProtectedRoute.jsx'
+import PublicOnlyRoute from './components/auth/PublicOnlyRoute.jsx'
 import Layout from './components/layout/Layout.jsx'
 import HomePage from './pages/HomePage.jsx'
 import LibraryPage from './pages/LibraryPage.jsx'
@@ -15,15 +17,19 @@ function App() {
   return (
     <Routes>
       <Route element={<Layout />}>
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/" element={<HomePage />} />
-        <Route path="/search" element={<SearchPage />} />
-        <Route path="/movie/:tmdbId" element={<MovieDetailsPage />} />
-        <Route path="/library" element={<LibraryPage />} />
-        <Route path="/lists" element={<ListsPage />} />
-        <Route path="/lists/:id" element={<ListDetailsPage />} />
-        <Route path="/profile" element={<ProfilePage />} />
+        <Route element={<PublicOnlyRoute />}>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+        </Route>
+        <Route element={<ProtectedRoute />}>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/search" element={<SearchPage />} />
+          <Route path="/movie/:tmdbId" element={<MovieDetailsPage />} />
+          <Route path="/library" element={<LibraryPage />} />
+          <Route path="/lists" element={<ListsPage />} />
+          <Route path="/lists/:id" element={<ListDetailsPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+        </Route>
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>

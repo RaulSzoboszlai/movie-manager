@@ -1,4 +1,5 @@
 import { Link, NavLink } from 'react-router-dom'
+import AccountNav from './AccountNav.jsx'
 
 const mainLinks = [
   { to: '/', label: 'Home' },
@@ -9,25 +10,10 @@ const mainLinks = [
 ]
 
 const linkBase = 'block rounded-md py-2 text-sm font-medium transition-colors motion-reduce:transition-none'
-const linkState = (isActive) =>
-  isActive ? 'bg-accent-soft text-accent' : 'text-muted hover:bg-surface-raised hover:text-text'
-
-// Account links use tighter padding on narrow screens so they fit beside the logo at 320px.
-const accountPadding = 'px-2 min-[860px]:px-3'
 
 function mainLinkClass({ isActive }) {
-  return `${linkBase} px-3 ${linkState(isActive)}`
-}
-
-function loginClass({ isActive }) {
-  return `${linkBase} ${accountPadding} ${linkState(isActive)}`
-}
-
-function registerClass({ isActive }) {
-  const state = isActive
-    ? 'border-accent bg-accent-soft text-accent'
-    : 'border-border-strong text-text hover:border-muted hover:bg-surface-raised'
-  return `${linkBase} ${accountPadding} border ${state}`
+  const state = isActive ? 'bg-accent-soft text-accent' : 'text-muted hover:bg-surface-raised hover:text-text'
+  return `${linkBase} px-3 ${state}`
 }
 
 function Navbar() {
@@ -50,14 +36,7 @@ function Navbar() {
           </ul>
         </nav>
 
-        <nav aria-label="Account" className="ml-auto flex items-center gap-1">
-          <NavLink to="/login" className={loginClass}>
-            Log in
-          </NavLink>
-          <NavLink to="/register" className={registerClass}>
-            Register
-          </NavLink>
-        </nav>
+        <AccountNav />
       </div>
     </header>
   )
