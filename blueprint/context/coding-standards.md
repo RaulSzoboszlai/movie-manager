@@ -99,8 +99,8 @@
 - No component library is installed. Keep shared primitives as local
   components rather than reaching for a new dependency.
 
-> TODO: the scaffold still ships `client/src/App.css` and the Vite starter
-> markup. Decide on dark/light handling when the first real screen lands.
+- The app is dark only, as described in Visual direction in
+  `blueprint/project-plan.md`. There is no light mode or theme toggle in v1.
 
 ## Testing
 
