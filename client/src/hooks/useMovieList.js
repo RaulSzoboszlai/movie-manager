@@ -4,7 +4,7 @@ import api from '../lib/api.js'
 const LOADING = { status: 'loading', movies: [] }
 const FAILED = { status: 'error', movies: [] }
 
-function useTrendingMovies() {
+function useMovieList(path) {
   const [result, setResult] = useState(LOADING)
   const [attempt, setAttempt] = useState(0)
 
@@ -12,7 +12,7 @@ function useTrendingMovies() {
     const controller = new AbortController()
 
     api
-      .get('/movies/trending', { signal: controller.signal })
+      .get(path, { signal: controller.signal })
       .then((response) => {
         if (!controller.signal.aborted) setResult({ status: 'ready', movies: response.data.movies })
       })
@@ -21,7 +21,7 @@ function useTrendingMovies() {
       })
 
     return () => controller.abort()
-  }, [attempt])
+  }, [path, attempt])
 
   function retry() {
     setResult(LOADING)
@@ -31,4 +31,4 @@ function useTrendingMovies() {
   return { ...result, retry }
 }
 
-export default useTrendingMovies
+export default useMovieList

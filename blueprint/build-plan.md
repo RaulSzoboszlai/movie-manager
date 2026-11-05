@@ -23,7 +23,7 @@ Each item below is one Blueprint feature loop: `/feature` → `/implement` → `
   - `GET /movies/trending`.
   - The home page shows the 10 `MovieCard`s in a single row that scrolls sideways, with large outlined rank numbers behind the posters (see `prototypes/home.html` and Visual direction in the project plan).
   - `prototypes/` is deleted when this feature completes.
-- [ ] **4a. Home page rows**
+- [x] **4a. Home page rows**
   - Rows such as *Popular*, *Top rated* and *Upcoming* under the Top 10, using regular movie cards.
   - The home page stops being vertically centered, since it now holds more than one row.
 - [ ] **5. Search**

@@ -42,14 +42,30 @@ function toMovieSummary(result) {
     };
 }
 
-export async function getTrendingMovies() {
-    const path = '/trending/movie/week';
+async function fetchMovieSummaries(path) {
     const body = await tmdbGet(path);
     if (!Array.isArray(body?.results)) {
         throw new Error(`TMDB response from ${path} has no results array`);
     }
 
-    return body.results.filter(isValidMovie).slice(0, TRENDING_LIMIT).map(toMovieSummary);
+    return body.results.filter(isValidMovie).map(toMovieSummary);
+}
+
+export async function getTrendingMovies() {
+    const movies = await fetchMovieSummaries('/trending/movie/week');
+    return movies.slice(0, TRENDING_LIMIT);
+}
+
+export function getPopularMovies() {
+    return fetchMovieSummaries('/movie/popular');
+}
+
+export function getTopRatedMovies() {
+    return fetchMovieSummaries('/movie/top_rated');
+}
+
+export function getUpcomingMovies() {
+    return fetchMovieSummaries('/movie/upcoming');
 }
 
 function isValidGenre(genre) {

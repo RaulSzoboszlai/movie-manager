@@ -1,6 +1,6 @@
 # Movie Manager - Project Overview
 
-<!-- blueprint:source-hash 447199f4f3de5bf38dd9be7c92a5da1bc413e2aa573f9a6371dad23fb0c9d2ab -->
+<!-- blueprint:source-hash 30faa01a026279b2adbd9d764f67044b0a3d8c54f09c75884c0e3d6b9e18daa9 -->
 
 > A private movie tracker: search TMDB, keep a watchlist, rate what you watched,
 > and organise films into your own lists.
@@ -176,6 +176,9 @@ cookie.
 | `POST /auth/logout` | Clear cookie | yes |
 | `GET /auth/me` | Current user, else 401 | yes |
 | `GET /movies/trending` | Top 10 this week | yes |
+| `GET /movies/popular` | Popular movies row | yes |
+| `GET /movies/top-rated` | Top rated movies row | yes |
+| `GET /movies/upcoming` | Upcoming movies row | yes |
 | `GET /movies/search?q=&genre=&year=&page=` | Search with filters | yes |
 | `GET /movies/genres` | Genre list for the filter | yes |
 | `GET /movies/:tmdbId` | Details + credits + videos | yes |
@@ -190,8 +193,6 @@ cookie.
 | `GET /profile/stats` | Profile statistics | yes |
 
 Feature 1 also adds `GET /api/health` for the app shell.
-
-> TODO: the endpoints for the home page rows (feature 4a) are not in the plans yet.
 
 **Search filter workaround.** TMDB's `/search/movie` filters by year but not by
 genre, so the server branches: with a text query it searches and filters results

@@ -125,6 +125,9 @@ The SavedMovie and List items store a small snapshot of each movie. This lets li
 | `POST /auth/logout` | Clear cookie | ✓ |
 | `GET /auth/me` | Current user, or 401 | ✓ |
 | `GET /movies/trending` | Top 10 trending this week | ✓ |
+| `GET /movies/popular` | Popular movies row | ✓ |
+| `GET /movies/top-rated` | Top rated movies row | ✓ |
+| `GET /movies/upcoming` | Upcoming movies row | ✓ |
 | `GET /movies/search?q=&genre=&year=&page=` | Search with filters | ✓ |
 | `GET /movies/genres` | Genre list for the filter | ✓ |
 | `GET /movies/:tmdbId` | Details + credits + videos | ✓ |
