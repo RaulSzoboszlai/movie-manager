@@ -26,7 +26,7 @@ Each item below is one Blueprint feature loop: `/feature` → `/implement` → `
 - [x] **4a. Home page rows**
   - Rows such as *Popular*, *Top rated* and *Upcoming* under the Top 10, using regular movie cards.
   - The home page stops being vertically centered, since it now holds more than one row.
-- [ ] **5. Search**
+- [x] **5. Search**
   - `GET /movies/search` and a search page with a debounced input.
   - Results grid, pagination ("Load more"), and the query kept in the URL.
 - [ ] **6. Search filters**

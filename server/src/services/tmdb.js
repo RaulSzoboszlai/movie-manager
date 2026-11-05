@@ -4,11 +4,17 @@ const BASE_URL = 'https://api.themoviedb.org/3';
 const REQUEST_TIMEOUT_MS = 8000;
 const TRENDING_LIMIT = 10;
 
+/** TMDB rejects any page above this, whatever its total_pages says. */
+export const MAX_PAGE = 500;
+
 // Errors stay free of the URL (it holds the key) and of any HTTP status: the
 // central handler would forward a TMDB 401 and the client would sign the user out.
-async function tmdbGet(path) {
+async function tmdbGet(path, params = {}) {
     const url = new URL(`${BASE_URL}${path}`);
     url.searchParams.set('api_key', TMDB_API_KEY);
+    for (const [name, value] of Object.entries(params)) {
+        url.searchParams.set(name, value);
+    }
 
     let response;
     let body;
@@ -42,13 +48,17 @@ function toMovieSummary(result) {
     };
 }
 
-async function fetchMovieSummaries(path) {
-    const body = await tmdbGet(path);
+function parseMovieSummaries(body, path) {
     if (!Array.isArray(body?.results)) {
         throw new Error(`TMDB response from ${path} has no results array`);
     }
 
     return body.results.filter(isValidMovie).map(toMovieSummary);
+}
+
+async function fetchMovieSummaries(path) {
+    const body = await tmdbGet(path);
+    return parseMovieSummaries(body, path);
 }
 
 export async function getTrendingMovies() {
@@ -66,6 +76,19 @@ export function getTopRatedMovies() {
 
 export function getUpcomingMovies() {
     return fetchMovieSummaries('/movie/upcoming');
+}
+
+export async function searchMovies(query, page) {
+    const path = '/search/movie';
+    const body = await tmdbGet(path, { query, page });
+    const movies = parseMovieSummaries(body, path);
+
+    const totalPages = body.total_pages;
+    if (!Number.isInteger(totalPages) || totalPages < 0) {
+        throw new Error(`TMDB response from ${path} has no valid total_pages`);
+    }
+
+    return { movies, page, totalPages: Math.min(totalPages, MAX_PAGE) };
 }
 
 function isValidGenre(genre) {
