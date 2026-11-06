@@ -28,7 +28,11 @@ function useMovieList(path) {
     setAttempt((current) => current + 1)
   }
 
-  return { ...result, retry }
+  function setMovies(update) {
+    setResult((current) => ({ ...current, movies: update(current.movies) }))
+  }
+
+  return { ...result, retry, setMovies }
 }
 
 export default useMovieList

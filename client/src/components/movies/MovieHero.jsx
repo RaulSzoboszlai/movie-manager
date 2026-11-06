@@ -1,11 +1,19 @@
 import { formatReleaseDate, formatRuntime } from '../../lib/movieFormat.js'
+import WatchlistButton from './WatchlistButton.jsx'
 
 const BACKDROP_BASE_URL = 'https://image.tmdb.org/t/p/w1280'
 const POSTER_BASE_URL = 'https://image.tmdb.org/t/p/w500'
 
 function MovieHero({ movie }) {
-  const { title, overview, posterPath, backdropPath, releaseDate, runtime, genres } = movie
+  const { tmdbId, title, overview, posterPath, backdropPath, releaseDate, runtime, genres } = movie
   const facts = [releaseDate && formatReleaseDate(releaseDate), runtime && formatRuntime(runtime)].filter(Boolean)
+  const snapshot = {
+    tmdbId,
+    title,
+    posterPath,
+    releaseYear: releaseDate ? Number(releaseDate.slice(0, 4)) : null,
+    genreIds: genres.map((genre) => genre.id),
+  }
 
   return (
     <section>
@@ -46,6 +54,10 @@ function MovieHero({ movie }) {
               ))}
             </ul>
           )}
+
+          <div className="mt-4 w-40">
+            <WatchlistButton movie={snapshot} />
+          </div>
 
           <p className={`mt-4 max-w-3xl leading-relaxed wrap-anywhere ${overview ? '' : 'text-muted'}`}>
             {overview || 'No overview available.'}

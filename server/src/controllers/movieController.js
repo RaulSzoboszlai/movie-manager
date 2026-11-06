@@ -47,7 +47,7 @@ function parsePage(page) {
     return value;
 }
 
-function parseTmdbId(tmdbId) {
+export function parseTmdbId(tmdbId) {
     if (!/^[1-9]\d{0,8}$/.test(tmdbId)) {
         throw httpError(400, 'Movie id must be a TMDB movie id');
     }

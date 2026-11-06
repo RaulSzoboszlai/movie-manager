@@ -40,7 +40,7 @@ Each item below is one Blueprint feature loop: `/feature` → `/implement` → `
   - A "You might also like" row on the details page.
 
 ## Phase 3 — My library
-- [ ] **9. Watchlist**
+- [x] **9. Watchlist**
   - SavedMovie model, with a snapshot that includes `genreIds[]`.
   - Add to and remove from the watchlist, from any card or the details page.
   - The watchlist button on cards and the details page reflects the saved state.

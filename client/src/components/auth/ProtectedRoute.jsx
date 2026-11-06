@@ -1,4 +1,5 @@
 import { Navigate, Outlet } from 'react-router-dom'
+import { LibraryProvider } from '../../context/LibraryContext.jsx'
 import useAuth from '../../hooks/useAuth.js'
 
 function ProtectedRoute() {
@@ -31,7 +32,11 @@ function ProtectedRoute() {
     )
   }
 
-  return <Outlet />
+  return (
+    <LibraryProvider>
+      <Outlet />
+    </LibraryProvider>
+  )
 }
 
 export default ProtectedRoute

@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import WatchlistButton from './WatchlistButton.jsx'
 
 const POSTER_BASE_URL = 'https://image.tmdb.org/t/p/w342'
 
@@ -11,7 +12,7 @@ function MovieCard({ movie, rank }) {
   const { tmdbId, title, posterPath, releaseYear } = movie
 
   return (
-    <article className={`w-[calc(var(--offset)+var(--poster-width))] ${getOffsetClass(rank)}`}>
+    <article className={`flex h-full w-[calc(var(--offset)+var(--poster-width))] flex-col ${getOffsetClass(rank)}`}>
       <Link to={`/movie/${tmdbId}`} className="group block outline-none">
         <div className="relative isolate">
           {rank !== undefined && (
@@ -39,7 +40,10 @@ function MovieCard({ movie, rank }) {
         </div>
         <h3 className="mt-3 ml-(--offset) text-sm leading-tight font-medium wrap-anywhere">{title}</h3>
       </Link>
-      {releaseYear !== null && <p className="mt-1 mb-3 ml-(--offset) text-xs text-muted">{releaseYear}</p>}
+      {releaseYear !== null && <p className="mt-1 ml-(--offset) text-xs text-muted">{releaseYear}</p>}
+      <div className="mt-auto ml-(--offset) pt-3">
+        <WatchlistButton movie={movie} />
+      </div>
     </article>
   )
 }

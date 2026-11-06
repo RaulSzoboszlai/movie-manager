@@ -62,3 +62,19 @@
 **Why it matters:** The effect calls `window.scrollTo(0, 0)` on every `tmdbId` change, whichever way the user navigated. Feature 8 adds the first links from one movie to another, and they sit at the bottom of the page, so a user who opens a similar movie and presses Back would have to scroll down again to try the next one. The remount also refetches the details, which leaves the page short while it loads, so the browser may not be able to restore the position anyway. The spec only requires Back to return to the previous movie, so this is not a contract break. /check confirmed the movie and row come back, but did not measure the scroll position after Back, so this is a lead from reading the code.
 **Suggested fix:** Measure scrollY after Back. If it does land at the top, decide whether that matters. A real fix means skipping the scroll on `useNavigationType() === 'POP'` and also restoring the position once the details have loaded, which is more than a one-line change. Feature 14's UX pass is a natural place for it. No current requirement would be lost.
 **Resolution:**
+
+### F-15 [P3] unverified - The rating and status rule will not run on update queries
+
+**File:** server/src/models/SavedMovie.js:30
+**Found:** 2026-11-06 by /audit (scope: current; lens: security)
+**Why it matters:** The rule that a rating needs `status: "watched"` lives in `pre('validate')`, which runs on `save()` and `create()`. Query updates such as `findOneAndUpdate` skip it. Nothing in the server uses those today, so this cannot happen yet, but feature 10's `PATCH /library/:tmdbId` could store a rating on an unwatched movie if it uses one. The behaviour of the hook on update queries comes from Mongoose's documented rules and was not run here.
+**Suggested fix:** In feature 10, load the document and call `save()` in the PATCH handler, and cover a rating on a `want` movie in its checks. No change needed in this feature.
+**Resolution:** Re-examined by /audit independent at 2988cc0 and still unverified. `validate()` on the model rejects a rating on a `want` movie, so the hook works on documents, and server/src still has no query update on SavedMovie, so the gap cannot be reached yet. The update-query behaviour itself was not run.
+
+### F-18 [P3] open - The "Try again" block is now copied into six components
+
+**File:** client/src/pages/LibraryPage.jsx:61
+**Found:** 2026-11-06 by /audit independent (scope: current; lens: quality)
+**Why it matters:** This feature adds a sixth copy of the same alert, button markup and long class string, alongside ProtectedRoute.jsx:22, MovieSection.jsx:28, MovieDetails.jsx:35, SearchPage.jsx:107 and SearchResults.jsx:41. The focus defects F-05 and F-09 live in this markup, and the coding standards ask for shared primitives as local components, so the outstanding fix would have to be repeated in each copy and the copies have already started to differ, with only the library page handling focus. Nothing is broken today.
+**Suggested fix:** Extract a small local retry component that takes the message and the retry handler, and fix F-05 and F-09 there. The library page keeps its focus handling through the handler it passes. No current requirement would be lost.
+**Resolution:**
