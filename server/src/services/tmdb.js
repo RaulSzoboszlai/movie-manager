@@ -211,6 +211,18 @@ export async function getMovieDetails(tmdbId) {
     return toMovieDetails(body);
 }
 
+/** Resolves to the movie's similar movies, or null when TMDB has no movie with this id. */
+export async function getSimilarMovies(tmdbId) {
+    try {
+        return await fetchMovieSummaries(`/movie/${tmdbId}/similar`);
+    } catch (err) {
+        if (err.tmdbStatus === 404) {
+            return null;
+        }
+        throw err;
+    }
+}
+
 async function fetchGenreMap() {
     const path = '/genre/movie/list';
     const body = await tmdbGet(path);

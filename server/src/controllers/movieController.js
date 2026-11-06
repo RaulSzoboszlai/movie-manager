@@ -3,6 +3,7 @@ import {
     getGenreMap,
     getMovieDetails,
     getPopularMovies,
+    getSimilarMovies,
     getTopRatedMovies,
     getTrendingMovies,
     getUpcomingMovies,
@@ -46,6 +47,13 @@ function parsePage(page) {
     return value;
 }
 
+function parseTmdbId(tmdbId) {
+    if (!/^[1-9]\d{0,8}$/.test(tmdbId)) {
+        throw httpError(400, 'Movie id must be a TMDB movie id');
+    }
+    return Number(tmdbId);
+}
+
 export async function trending(req, res) {
     const movies = await getTrendingMovies();
     res.json({ movies });
@@ -87,14 +95,17 @@ export async function genres(req, res) {
 }
 
 export async function details(req, res) {
-    const { tmdbId } = req.params;
-    if (!/^[1-9]\d{0,8}$/.test(tmdbId)) {
-        throw httpError(400, 'Movie id must be a TMDB movie id');
-    }
-
-    const movie = await getMovieDetails(Number(tmdbId));
+    const movie = await getMovieDetails(parseTmdbId(req.params.tmdbId));
     if (!movie) {
         throw httpError(404, 'Movie not found');
     }
     res.json({ movie });
+}
+
+export async function similar(req, res) {
+    const movies = await getSimilarMovies(parseTmdbId(req.params.tmdbId));
+    if (!movies) {
+        throw httpError(404, 'Movie not found');
+    }
+    res.json({ movies });
 }

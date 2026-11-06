@@ -45,7 +45,7 @@
 **Found:** 2026-11-05 by /audit (scope: current; lens: quality)
 **Why it matters:** A retry replaces the error block with the loading text, which removes the focused button. Reproduced in headless Chrome: after a retry that failed again, focus was on the document body. The spec's state table calls for this swap, so it is not a contract break. It is the same pattern as F-05, and `MovieSection` shares the markup, though that component was not run.
 **Suggested fix:** Fix alongside F-05: move focus to the new "Try again" button when a retry fails, or keep the button mounted with `aria-disabled` during the retry. No current requirement would be lost.
-**Resolution:** Re-examined by /audit on 2026-11-05 and still open: a fresh run again left focus on the document body after a failed retry.
+**Resolution:** Re-examined by /audit on 2026-11-05 and still open: a fresh run again left focus on the document body after a failed retry. Re-examined by /audit on 2026-11-06 and still open: `MovieSection` (client/src/components/movies/MovieSection.jsx:32) is now confirmed to do the same, since feature 8's /check saw focus on the document body after a failed retry in the details page's similar row. Feature 8 reuses the component and did not cause this, so any fix should cover `MovieSection` too.
 
 ### F-10 [P3] unverified - Screen readers may not be told when search results arrive
 
@@ -53,4 +53,12 @@
 **Found:** 2026-11-05 by /audit (scope: current; lens: quality)
 **Why it matters:** Results appear as the user types, but the results state has no live announcement, and the loading and empty `role="status"` elements (lines 22 and 41) mount with their text already inside, which some browser and screen reader pairs announce unreliably. No screen reader was run, so this is a lead and not a confirmed defect. Related to F-04.
 **Suggested fix:** Test with NVDA or Narrator. If results or the empty message go unannounced, keep one `role="status"` element mounted in `SearchPage` and update its text (for example the empty message, or "Results loaded"). No current requirement would be lost.
+**Resolution:**
+
+### F-11 [P3] unverified - Browser Back from a similar movie probably lands at the top, not at the row
+
+**File:** client/src/pages/MovieDetailsPage.jsx:8
+**Found:** 2026-11-06 by /audit (scope: current; lens: quality)
+**Why it matters:** The effect calls `window.scrollTo(0, 0)` on every `tmdbId` change, whichever way the user navigated. Feature 8 adds the first links from one movie to another, and they sit at the bottom of the page, so a user who opens a similar movie and presses Back would have to scroll down again to try the next one. The remount also refetches the details, which leaves the page short while it loads, so the browser may not be able to restore the position anyway. The spec only requires Back to return to the previous movie, so this is not a contract break. /check confirmed the movie and row come back, but did not measure the scroll position after Back, so this is a lead from reading the code.
+**Suggested fix:** Measure scrollY after Back. If it does land at the top, decide whether that matters. A real fix means skipping the scroll on `useNavigationType() === 'POP'` and also restoring the position once the details have loaded, which is more than a one-line change. Feature 14's UX pass is a natural place for it. No current requirement would be lost.
 **Resolution:**

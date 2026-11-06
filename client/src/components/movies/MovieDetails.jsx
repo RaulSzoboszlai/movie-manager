@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import useMovieDetails from '../../hooks/useMovieDetails.js'
 import CastRow from './CastRow.jsx'
 import MovieHero from './MovieHero.jsx'
+import MovieSection from './MovieSection.jsx'
 import TrailerEmbed from './TrailerEmbed.jsx'
 
 function MovieDetails({ tmdbId }) {
@@ -49,6 +50,7 @@ function MovieDetails({ tmdbId }) {
       <MovieHero movie={movie} />
       <CastRow cast={movie.cast} />
       {movie.trailerKey && <TrailerEmbed trailerKey={movie.trailerKey} title={movie.title} />}
+      <MovieSection path={`/movies/${movie.tmdbId}/similar`} heading="You might also like" noun="similar" />
     </div>
   )
 }

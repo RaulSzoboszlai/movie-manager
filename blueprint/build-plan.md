@@ -35,7 +35,7 @@ Each item below is one Blueprint feature loop: `/feature` → `/implement` → `
 - [x] **7. Movie details page**
   - `GET /movies/:tmdbId` using `append_to_response=credits,videos`.
   - Shows the backdrop, overview, cast row and YouTube trailer embed.
-- [ ] **8. Similar movies**
+- [x] **8. Similar movies**
   - `GET /movies/:tmdbId/similar`.
   - A "You might also like" row on the details page.
 
