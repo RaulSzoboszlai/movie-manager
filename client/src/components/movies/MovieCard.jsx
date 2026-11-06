@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import WatchlistButton from './WatchlistButton.jsx'
+import LibraryControls from './LibraryControls.jsx'
 
 const POSTER_BASE_URL = 'https://image.tmdb.org/t/p/w342'
 
@@ -42,7 +42,7 @@ function MovieCard({ movie, rank }) {
       </Link>
       {releaseYear !== null && <p className="mt-1 ml-(--offset) text-xs text-muted">{releaseYear}</p>}
       <div className="mt-auto ml-(--offset) pt-3">
-        <WatchlistButton movie={movie} />
+        <LibraryControls movie={movie} />
       </div>
     </article>
   )

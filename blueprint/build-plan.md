@@ -45,7 +45,7 @@ Each item below is one Blueprint feature loop: `/feature` → `/implement` → `
   - Add to and remove from the watchlist, from any card or the details page.
   - The watchlist button on cards and the details page reflects the saved state.
   - Library page with the *Want to watch* tab.
-- [ ] **10. Watched & rating**
+- [x] **10. Watched & rating**
   - `PATCH /library/:tmdbId` to mark a movie watched (records `watchedAt`) and to set or clear its rating.
   - `POST /library` also accepts `status: "watched"`, so a movie can be marked watched without going through the watchlist first.
   - Star rating component; the rating is only enabled once the movie is watched.

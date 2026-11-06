@@ -1,5 +1,5 @@
 import { formatReleaseDate, formatRuntime } from '../../lib/movieFormat.js'
-import WatchlistButton from './WatchlistButton.jsx'
+import LibraryControls from './LibraryControls.jsx'
 
 const BACKDROP_BASE_URL = 'https://image.tmdb.org/t/p/w1280'
 const POSTER_BASE_URL = 'https://image.tmdb.org/t/p/w500'
@@ -56,7 +56,7 @@ function MovieHero({ movie }) {
           )}
 
           <div className="mt-4 w-40">
-            <WatchlistButton movie={snapshot} />
+            <LibraryControls movie={snapshot} alwaysShowRating />
           </div>
 
           <p className={`mt-4 max-w-3xl leading-relaxed wrap-anywhere ${overview ? '' : 'text-muted'}`}>

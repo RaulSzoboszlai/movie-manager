@@ -63,18 +63,34 @@
 **Suggested fix:** Measure scrollY after Back. If it does land at the top, decide whether that matters. A real fix means skipping the scroll on `useNavigationType() === 'POP'` and also restoring the position once the details have loaded, which is more than a one-line change. Feature 14's UX pass is a natural place for it. No current requirement would be lost.
 **Resolution:**
 
-### F-15 [P3] unverified - The rating and status rule will not run on update queries
-
-**File:** server/src/models/SavedMovie.js:30
-**Found:** 2026-11-06 by /audit (scope: current; lens: security)
-**Why it matters:** The rule that a rating needs `status: "watched"` lives in `pre('validate')`, which runs on `save()` and `create()`. Query updates such as `findOneAndUpdate` skip it. Nothing in the server uses those today, so this cannot happen yet, but feature 10's `PATCH /library/:tmdbId` could store a rating on an unwatched movie if it uses one. The behaviour of the hook on update queries comes from Mongoose's documented rules and was not run here.
-**Suggested fix:** In feature 10, load the document and call `save()` in the PATCH handler, and cover a rating on a `want` movie in its checks. No change needed in this feature.
-**Resolution:** Re-examined by /audit independent at 2988cc0 and still unverified. `validate()` on the model rejects a rating on a `want` movie, so the hook works on documents, and server/src still has no query update on SavedMovie, so the gap cannot be reached yet. The update-query behaviour itself was not run.
-
 ### F-18 [P3] open - The "Try again" block is now copied into six components
 
-**File:** client/src/pages/LibraryPage.jsx:61
+**File:** client/src/pages/LibraryPage.jsx:113
 **Found:** 2026-11-06 by /audit independent (scope: current; lens: quality)
 **Why it matters:** This feature adds a sixth copy of the same alert, button markup and long class string, alongside ProtectedRoute.jsx:22, MovieSection.jsx:28, MovieDetails.jsx:35, SearchPage.jsx:107 and SearchResults.jsx:41. The focus defects F-05 and F-09 live in this markup, and the coding standards ask for shared primitives as local components, so the outstanding fix would have to be repeated in each copy and the copies have already started to differ, with only the library page handling focus. Nothing is broken today.
 **Suggested fix:** Extract a small local retry component that takes the message and the retry handler, and fix F-05 and F-09 there. The library page keeps its focus handling through the handler it passes. No current requirement would be lost.
+**Resolution:** Re-examined by /audit independent at 2b11445 and still open. Feature 10 moved the library page's copy from line 61 to line 113 without adding another copy. The spec leaves this finding out of scope.
+
+### F-19 [P3] open - Button class strings are exported from the action hook
+
+**File:** client/src/hooks/useLibraryAction.js:3
+**Found:** 2026-11-06 by /audit independent (scope: current; lens: quality)
+**Why it matters:** `BUTTON_BASE_CLASS` and `BUTTON_IDLE_CLASS` have nothing to do with pending or failure handling, yet `WatchlistButton` and `WatchedButton` import them from this hook file. The coding standards keep hooks for reusable logic and the spec asks to keep this hook small, listing only `pending`, `failed` and the two repeat guards. The next control that wants the button look will have to import styling from a state hook. Nothing is broken today.
+**Suggested fix:** Move the two constants to a small module beside the buttons, such as client/src/components/movies/libraryButtonClasses.js, and import them from there. No current requirement would be lost.
+**Resolution:**
+
+### F-20 [P3] open - The status check is written twice in the library controller
+
+**File:** server/src/controllers/libraryController.js:13
+**Found:** 2026-11-06 by /audit independent (scope: current; lens: quality)
+**Why it matters:** `requireStatus` (line 21) repeats the same `includes` check and error message as `parseStatus` (line 13). The spec rules out using `parseStatus` for bodies because it treats `""` as unset, but that does not stop `parseStatus` from calling `requireStatus`. A change to the message or the allowed values now has two places to edit. `requireRating` also returns a value that its only caller ignores. Nothing is broken today.
+**Suggested fix:** Have `parseStatus` return null for `undefined` or `""` and otherwise return `requireStatus(status)`, and drop the `return rating` from `requireRating`, renaming nothing else. No current requirement would be lost.
+**Resolution:**
+
+### F-21 [P3] open - A source comment cites a ledger ID that will not stay valid
+
+**File:** server/src/controllers/libraryController.js:121
+**Found:** 2026-11-06 by /audit independent (scope: current; lens: quality)
+**Why it matters:** The comment ends with `(F-15)`, the only finding ID in client/src or server/src. Bare IDs are scoped to the live ledger: `/complete` archives this one under a work-item prefix and the ledger later restarts its numbering, so a future F-15 could be an unrelated finding and mislead a reader. The rest of the comment already explains the reason in full.
+**Suggested fix:** Delete ` (F-15)` from the comment. No current requirement would be lost.
 **Resolution:**
