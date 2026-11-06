@@ -3,12 +3,14 @@ const { TMDB_API_KEY } = process.env;
 const BASE_URL = 'https://api.themoviedb.org/3';
 const REQUEST_TIMEOUT_MS = 8000;
 const TRENDING_LIMIT = 10;
+const CAST_LIMIT = 12;
 
 /** TMDB rejects any page above this, whatever its total_pages says. */
 export const MAX_PAGE = 500;
 
-// Errors stay free of the URL (it holds the key) and of any HTTP status: the
-// central handler would forward a TMDB 401 and the client would sign the user out.
+// Errors stay free of the URL (it holds the key) and never set `status`: the central
+// handler would forward a TMDB 401 and the client would sign the user out. Callers
+// that need TMDB's status read `tmdbStatus`, which the handler ignores.
 async function tmdbGet(path, params = {}) {
     const url = new URL(`${BASE_URL}${path}`);
     url.searchParams.set('api_key', TMDB_API_KEY);
@@ -26,13 +28,19 @@ async function tmdbGet(path, params = {}) {
     }
 
     if (!response.ok) {
-        throw new Error(`TMDB request to ${path} failed: HTTP ${response.status}`);
+        throw Object.assign(new Error(`TMDB request to ${path} failed: HTTP ${response.status}`), {
+            tmdbStatus: response.status,
+        });
     }
     return body;
 }
 
 function isValidMovie(result) {
     return Number.isInteger(result?.id) && result.id > 0 && typeof result.title === 'string' && result.title !== '';
+}
+
+function parseImagePath(path) {
+    return typeof path === 'string' && path.startsWith('/') ? path : null;
 }
 
 function toMovieSummary(result) {
@@ -42,7 +50,7 @@ function toMovieSummary(result) {
     return {
         tmdbId: id,
         title,
-        posterPath: typeof posterPath === 'string' && posterPath.startsWith('/') ? posterPath : null,
+        posterPath: parseImagePath(posterPath),
         releaseYear: year ? Number(year[0]) : null,
         genreIds: Array.isArray(genreIds) ? genreIds.filter(Number.isInteger) : [],
     };
@@ -112,6 +120,95 @@ export async function searchMovies({ query, genre, year, page }) {
 
 function isValidGenre(genre) {
     return Number.isInteger(genre?.id) && typeof genre.name === 'string' && genre.name !== '';
+}
+
+function parseReleaseDate(date) {
+    return typeof date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(date) && !Number.isNaN(Date.parse(date))
+        ? date
+        : null;
+}
+
+function isValidCastMember(member) {
+    return (
+        Number.isInteger(member?.id) && member.id > 0 && typeof member.name === 'string' && member.name !== ''
+    );
+}
+
+function parseCast(cast) {
+    if (!Array.isArray(cast)) {
+        return [];
+    }
+
+    // One actor can hold two credits on a film, and the client keys cards by person id.
+    const seen = new Set();
+    const members = cast.filter(isValidCastMember).filter(({ id }) => {
+        if (seen.has(id)) {
+            return false;
+        }
+        seen.add(id);
+        return true;
+    });
+
+    return members.slice(0, CAST_LIMIT).map(({ id, name, character, profile_path: profilePath }) => ({
+        id,
+        name,
+        character: typeof character === 'string' ? character : '',
+        profilePath: parseImagePath(profilePath),
+    }));
+}
+
+function parseTrailerKey(videos) {
+    if (!Array.isArray(videos)) {
+        return null;
+    }
+
+    // The key is placed in an iframe URL on the client.
+    const trailers = videos.filter(
+        (video) =>
+            video?.site === 'YouTube' &&
+            video.type === 'Trailer' &&
+            typeof video.key === 'string' &&
+            /^[\w-]+$/.test(video.key),
+    );
+    const trailer = trailers.find((video) => video.official === true) ?? trailers[0];
+    return trailer ? trailer.key : null;
+}
+
+function toMovieDetails(result) {
+    const { id, title, overview, poster_path, backdrop_path, release_date, runtime, genres, credits, videos } = result;
+
+    return {
+        tmdbId: id,
+        title,
+        overview: typeof overview === 'string' ? overview : '',
+        posterPath: parseImagePath(poster_path),
+        backdropPath: parseImagePath(backdrop_path),
+        releaseDate: parseReleaseDate(release_date),
+        runtime: Number.isInteger(runtime) && runtime > 0 ? runtime : null,
+        genres: Array.isArray(genres) ? genres.filter(isValidGenre).map(({ id, name }) => ({ id, name })) : [],
+        cast: parseCast(credits?.cast),
+        trailerKey: parseTrailerKey(videos?.results),
+    };
+}
+
+/** Resolves to the movie's details, or null when TMDB has no movie with this id. */
+export async function getMovieDetails(tmdbId) {
+    const path = `/movie/${tmdbId}`;
+
+    let body;
+    try {
+        body = await tmdbGet(path, { append_to_response: 'credits,videos' });
+    } catch (err) {
+        if (err.tmdbStatus === 404) {
+            return null;
+        }
+        throw err;
+    }
+
+    if (!isValidMovie(body)) {
+        throw new Error(`TMDB response from ${path} is not a valid movie`);
+    }
+    return toMovieDetails(body);
 }
 
 async function fetchGenreMap() {

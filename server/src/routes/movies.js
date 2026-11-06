@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { genres, popular, search, topRated, trending, upcoming } from '../controllers/movieController.js';
+import { details, genres, popular, search, topRated, trending, upcoming } from '../controllers/movieController.js';
 import { requireAuth } from '../middleware/requireAuth.js';
 
 const router = Router();
@@ -12,5 +12,6 @@ router.get('/top-rated', topRated);
 router.get('/upcoming', upcoming);
 router.get('/search', search);
 router.get('/genres', genres);
+router.get('/:tmdbId', details);
 
 export default router;

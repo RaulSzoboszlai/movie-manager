@@ -32,7 +32,7 @@ Each item below is one Blueprint feature loop: `/feature` → `/implement` → `
 - [x] **6. Search filters**
   - `GET /movies/genres`, served from the cached genre list, plus genre and year selects.
   - Server-side filter logic: search vs. discover (see the note in the project plan).
-- [ ] **7. Movie details page**
+- [x] **7. Movie details page**
   - `GET /movies/:tmdbId` using `append_to_response=credits,videos`.
   - Shows the backdrop, overview, cast row and YouTube trailer embed.
 - [ ] **8. Similar movies**

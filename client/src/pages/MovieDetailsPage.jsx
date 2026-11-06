@@ -1,10 +1,15 @@
+import { useEffect } from 'react'
+import { useParams } from 'react-router-dom'
+import MovieDetails from '../components/movies/MovieDetails.jsx'
+
 function MovieDetailsPage() {
-  return (
-    <>
-      <h1 className="text-3xl font-bold tracking-tight min-[860px]:text-4xl">Movie details</h1>
-      <p className="mt-1 text-muted">Details for this movie will appear here.</p>
-    </>
-  )
+  const { tmdbId } = useParams()
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [tmdbId])
+
+  return <MovieDetails key={tmdbId} tmdbId={tmdbId} />
 }
 
 export default MovieDetailsPage

@@ -1,6 +1,7 @@
 import { httpError } from '../middleware/errorHandler.js';
 import {
     getGenreMap,
+    getMovieDetails,
     getPopularMovies,
     getTopRatedMovies,
     getTrendingMovies,
@@ -83,4 +84,17 @@ export async function genres(req, res) {
         .map(([id, name]) => ({ id, name }))
         .sort((a, b) => a.name.localeCompare(b.name));
     res.json({ genres: list });
+}
+
+export async function details(req, res) {
+    const { tmdbId } = req.params;
+    if (!/^[1-9]\d{0,8}$/.test(tmdbId)) {
+        throw httpError(400, 'Movie id must be a TMDB movie id');
+    }
+
+    const movie = await getMovieDetails(Number(tmdbId));
+    if (!movie) {
+        throw httpError(404, 'Movie not found');
+    }
+    res.json({ movie });
 }
