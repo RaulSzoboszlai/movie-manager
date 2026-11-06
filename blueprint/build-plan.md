@@ -47,6 +47,7 @@ Each item below is one Blueprint feature loop: `/feature` → `/implement` → `
   - Library page with the *Want to watch* tab.
 - [ ] **10. Watched & rating**
   - `PATCH /library/:tmdbId` to mark a movie watched (records `watchedAt`) and to set or clear its rating.
+  - `POST /library` also accepts `status: "watched"`, so a movie can be marked watched without going through the watchlist first.
   - Star rating component; the rating is only enabled once the movie is watched.
   - *Watched* tab on the library page.
 

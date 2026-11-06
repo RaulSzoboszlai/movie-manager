@@ -1,6 +1,6 @@
 # Movie Manager - Project Overview
 
-<!-- blueprint:source-hash 596385cda2edd8d1fe41f43b23fbab63e548ac090c0c77117347449a99cd4a93 -->
+<!-- blueprint:source-hash 84a4d5d406fd5109dbc0ded717882d58dce6b0e693aec2d0a59c524b00662a72 -->
 
 > A private movie tracker: search TMDB, keep a watchlist, rate what you watched,
 > and organise films into your own lists.
@@ -68,8 +68,10 @@ In `build-plan.md` order. One Blueprint feature loop each.
    add and remove from any card or the details page; saved state reflected on
    cards and details; library *Want to watch* tab.
 10. **Watched & rating** - `PATCH /library/:tmdbId` to mark watched (records
-    `watchedAt`) and to set or clear a rating; star component enabled only once
-    watched; *Watched* tab.
+    `watchedAt`) and to set or clear a rating; `POST /library` also accepts
+    `status: "watched"`, so any card or the details page can mark a movie watched
+    without going through the watchlist; star component enabled only once watched;
+    *Watched* tab.
 
 **Phase 4 - Lists & profile**
 
@@ -132,6 +134,10 @@ One document per user and movie. This is the library.
 - `createdAt`, `updatedAt` (Date)
 - Unique compound index on `{ user, tmdbId }` - one row per user per film
 
+Moving a watched movie back to *Want to watch* clears its `rating` and
+`watchedAt`, with a confirmation first if it has a rating. To remove a watched
+movie from the library, move it back and then remove it from the watchlist.
+
 ### List
 
 - `user` (ObjectId, ref `User`, required)
@@ -156,8 +162,9 @@ TMDB's trending, search, discover and similar payloads carry only `genre_ids`;
 only the details endpoint returns full `{ id, name }` objects. Storing ids lets a
 movie be saved from any card without a second TMDB call.
 
-- **Resolution:** `services/tmdb.js` fetches `/genre/movie/list` once and caches
-  the id-to-name map in memory (feature 4).
+- **Resolution:** `services/tmdb.js` fetches `/genre/movie/list` on first use, not
+  at startup, and caches the id-to-name map in memory until the server restarts
+  (feature 4). A failed fetch isn't cached, so the next request tries again.
 - **Consumers:** `GET /movies/genres` for the search filter, and
   `GET /profile/stats` for top genres.
 - **Client contract:** when adding to the library, the client sends `genreIds`
@@ -184,7 +191,7 @@ cookie.
 | `GET /movies/:tmdbId` | Details + credits + videos | yes |
 | `GET /movies/:tmdbId/similar` | Similar movies | yes |
 | `GET /library?status=` | User's saved movies | yes |
-| `POST /library` | Add to watchlist | yes |
+| `POST /library` | Add to watchlist, or save directly as watched | yes |
 | `PATCH /library/:tmdbId` | Change status or rating | yes |
 | `DELETE /library/:tmdbId` | Remove from library | yes |
 | `GET /lists`, `POST /lists` | List and create lists | yes |
@@ -283,7 +290,7 @@ Dark and cinematic, so posters stand out. Inter throughout (400, 500, 700, 900) 
 | Error | `#ff6b6b` |
 | Stars, filled and empty | gold `#f5b301`, `#56607a` |
 
-- **Movie cards:** 2:3 poster with a thin border and 10px corners, then title and year, then the watchlist button or watched state with stars. Hover lifts the poster; the focus ring sits on the poster.
+- **Movie cards:** 2:3 poster with a thin border and 10px corners, then title and year, then the watchlist and watched buttons, or the watched state with stars once the movie is watched. Hover lifts the poster; the focus ring sits on the poster.
 - **Top 10 row:** one sideways-scrolling row, never a grid. A huge outlined rank number in the page color stands behind the left edge of each poster, and its outline turns blue on hover. All numbers are the same size, so the "10" card is wider. Titles and buttons line up under the poster. Only the row scrolls, never the page.
 
 ## Deployment
@@ -302,10 +309,3 @@ What is already fixed:
 - Health path: `GET /api/health`
 - Cookies need `secure`, and the deployed `CLIENT_URL` drives CORS
 - No workers or cron jobs
-
-## Open questions
-
-- **In-memory genre cache lifetime.** `services/tmdb.js` caches TMDB's genre
-  list in memory with no stated refresh or failure behavior. Feature 4 should
-  decide what happens when the fetch fails at startup and whether the cache ever
-  refreshes; a stale map would mislabel genres on `/profile/stats`.

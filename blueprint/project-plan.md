@@ -32,7 +32,8 @@
 
 ### My library
 - **Watchlist:** add any movie with status *Want to watch*, or remove it.
-- **Mark as watched:** this moves the movie to *Watched* and records the watched date.
+- **Mark as watched:** from any card or the details page, whether or not the movie is on the watchlist. This puts the movie in *Watched* and records the watched date.
+- **Undo watched:** a watched movie can be moved back to *Want to watch*, which clears its rating and watched date. If it has a rating, the app asks for confirmation first. To remove a watched movie from the library, move it back and then remove it from the watchlist.
 - **Rating:**
   - 1–5 stars, available only once a movie is *Watched*
   - can be changed or cleared later
@@ -112,7 +113,7 @@ Each half can also run on its own from its own folder. In development, Vite prox
 The SavedMovie and List items store a small snapshot of each movie. This lets library and list pages render without calling TMDB for every movie.
 
 **Genres are stored as ids, not names.** TMDB's trending, search, discover and similar payloads include only `genre_ids`; just the details endpoint returns full `{ id, name }` objects. Storing ids means a movie can be saved from any card without an extra TMDB call.
-- **Converting ids to names:** `services/tmdb.js` fetches TMDB's movie genre list (`/genre/movie/list`) once and caches it in memory.
+- **Converting ids to names:** `services/tmdb.js` fetches TMDB's movie genre list (`/genre/movie/list`) on first use, not at startup, and caches it in memory until the server restarts. A failed fetch isn't cached, so the next request tries again.
 - **Who uses it:** `GET /movies/genres` (the search filter) and `GET /profile/stats` (top genres).
 - **What the client sends:** when adding to the library, the client sends `genreIds` from whatever payload it has. On the details page, that means the ids taken from `genres[].id`.
 
@@ -133,7 +134,7 @@ The SavedMovie and List items store a small snapshot of each movie. This lets li
 | `GET /movies/:tmdbId` | Details + credits + videos | ✓ |
 | `GET /movies/:tmdbId/similar` | Similar movies | ✓ |
 | `GET /library?status=` | User's saved movies | ✓ |
-| `POST /library` | Add to watchlist | ✓ |
+| `POST /library` | Add to watchlist, or save directly as watched | ✓ |
 | `PATCH /library/:tmdbId` | Change status / rating | ✓ |
 | `DELETE /library/:tmdbId` | Remove from library | ✓ |
 | `GET /lists` · `POST /lists` | List / create lists | ✓ |
@@ -192,7 +193,7 @@ The look was chosen with a prototype, and this section keeps it after the protot
   - error: `#ff6b6b`
 - **Stars:** gold `#f5b301` when filled, `#56607a` when empty. Stars stay gold even though the accent is blue.
 - **Font:** Inter for everything (weights 400, 500, 700 and 900), falling back to the system sans.
-- **Movie cards:** a 2:3 poster with a thin border and 10px corners, then the title and year, then the watchlist button or the watched state with stars. On hover the poster lifts slightly. The keyboard focus ring sits on the poster.
+- **Movie cards:** a 2:3 poster with a thin border and 10px corners, then the title and year, then the watchlist and watched buttons, or the watched state with stars once the movie is watched. On hover the poster lifts slightly. The keyboard focus ring sits on the poster.
 - **Top 10 row:** one row that scrolls sideways, not a grid. Each card has a huge outlined rank number in the page color, standing behind the left edge of the poster, with the poster covering part of it. The outline turns blue on hover. All numbers are the same size, so the "10" card is wider. Titles and buttons line up under the poster. Only the row scrolls, never the page.
 
 ## Conventions
