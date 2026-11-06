@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
 import api from '../lib/api.js'
 
-const LOADING = { status: 'loading', movies: [], page: 0, totalPages: 0, focusCard: null }
+const LOADING = { status: 'loading', movies: [], page: 0, totalPages: 0, focusCard: null, addedNone: false }
 const FAILED = { ...LOADING, status: 'error' }
 
-function fetchPage(query, page, signal) {
-  return api.get('/movies/search', { params: { q: query, page }, signal })
+// Axios leaves out undefined params, so unset filters never reach the URL.
+function fetchPage({ query, genre, year }, page, signal) {
+  const params = { q: query || undefined, genre: genre || undefined, year: year || undefined, page }
+  return api.get('/movies/search', { params, signal })
 }
 
 // TMDB can repeat a movie across pages, and tmdbId is the React key.
@@ -20,14 +22,15 @@ function appendUnique(movies, incoming) {
 }
 
 // Load more keeps focus while it stays on screen. An object, so that asking for the
-// same card twice still moves focus.
+// same card twice still moves focus. With no cards at all, the object only signals
+// that focus must move, and SearchResults sends it to the empty message.
 function nextFocusCard(previousCount, count, isLastPage, current) {
   if (count > previousCount) return { index: previousCount }
-  return isLastPage ? { index: count - 1 } : current
+  return isLastPage ? { index: Math.max(count - 1, 0) } : current
 }
 
-/** Expects a remount (via `key`) when the query changes, so state never carries over. */
-function useMovieSearch(query) {
+/** Expects a remount (via `key`) when the search changes, so state never carries over. */
+function useMovieSearch({ query, genre, year }) {
   const [result, setResult] = useState(LOADING)
   const [loadMoreStatus, setLoadMoreStatus] = useState('idle')
   const [attempt, setAttempt] = useState(0)
@@ -36,15 +39,17 @@ function useMovieSearch(query) {
   useEffect(() => {
     const controller = new AbortController()
 
-    fetchPage(query, 1, controller.signal)
+    fetchPage({ query, genre, year }, 1, controller.signal)
       .then(({ data }) => {
         if (controller.signal.aborted) return
+        const movies = appendUnique([], data.movies)
         setResult({
           status: 'ready',
-          movies: appendUnique([], data.movies),
+          movies,
           page: data.page,
           totalPages: data.totalPages,
           focusCard: null,
+          addedNone: movies.length === 0,
         })
       })
       .catch(() => {
@@ -55,7 +60,7 @@ function useMovieSearch(query) {
       controller.abort()
       loadMoreController.current?.abort()
     }
-  }, [query, attempt])
+  }, [query, genre, year, attempt])
 
   function retry() {
     setResult(LOADING)
@@ -70,7 +75,7 @@ function useMovieSearch(query) {
     setLoadMoreStatus('loading')
 
     try {
-      const { data } = await fetchPage(query, result.page + 1, controller.signal)
+      const { data } = await fetchPage({ query, genre, year }, result.page + 1, controller.signal)
       if (controller.signal.aborted) return
 
       const movies = appendUnique(result.movies, data.movies)
@@ -85,6 +90,7 @@ function useMovieSearch(query) {
           data.page >= data.totalPages,
           result.focusCard,
         ),
+        addedNone: movies.length === result.movies.length,
       })
       setLoadMoreStatus('idle')
     } catch {
@@ -94,9 +100,12 @@ function useMovieSearch(query) {
     }
   }
 
+  const hasMore = result.page < result.totalPages
+
   return {
     ...result,
-    hasMore: result.page < result.totalPages,
+    hasMore,
+    noNewMatches: result.addedNone && hasMore,
     loadMoreStatus,
     retry,
     loadMore,

@@ -29,7 +29,7 @@ Each item below is one Blueprint feature loop: `/feature` → `/implement` → `
 - [x] **5. Search**
   - `GET /movies/search` and a search page with a debounced input.
   - Results grid, pagination ("Load more"), and the query kept in the URL.
-- [ ] **6. Search filters**
+- [x] **6. Search filters**
   - `GET /movies/genres`, served from the cached genre list, plus genre and year selects.
   - Server-side filter logic: search vs. discover (see the note in the project plan).
 - [ ] **7. Movie details page**

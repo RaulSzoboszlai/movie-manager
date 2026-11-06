@@ -5,16 +5,27 @@ import MovieGrid from './MovieGrid.jsx'
 const BUTTON_CLASS =
   'rounded-md bg-accent px-4 py-2 font-medium text-accent-ink transition-colors hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent aria-disabled:cursor-not-allowed aria-disabled:opacity-60 motion-reduce:transition-none'
 
-function SearchResults({ query }) {
+function emptyMessage(query, hasFilters) {
+  if (!query) return 'No movies match these filters.'
+  return hasFilters ? `No movies found for "${query}" with these filters.` : `No movies found for "${query}".`
+}
+
+function SearchResults({ query, genre, year }) {
   const headingId = useId()
   const gridRef = useRef(null)
-  const { status, movies, focusCard, hasMore, loadMoreStatus, retry, loadMore } = useMovieSearch(query)
+  const emptyRef = useRef(null)
+  const { status, movies, focusCard, hasMore, noNewMatches, loadMoreStatus, retry, loadMore } = useMovieSearch({
+    query,
+    genre,
+    year,
+  })
   const isLoadingMore = loadMoreStatus === 'loading'
 
   // The Load more button can disappear on the last page, which would drop focus.
   useEffect(() => {
     if (focusCard === null) return
-    gridRef.current?.children[focusCard.index]?.querySelector('a')?.focus()
+    const target = emptyRef.current ?? gridRef.current?.children[focusCard.index]?.querySelector('a')
+    target?.focus()
   }, [focusCard])
 
   if (status === 'loading') {
@@ -36,24 +47,27 @@ function SearchResults({ query }) {
     )
   }
 
-  if (movies.length === 0) {
+  if (movies.length === 0 && !hasMore) {
     return (
-      <p role="status" className="text-muted wrap-anywhere">
-        No movies found for &quot;{query}&quot;.
+      <p ref={emptyRef} role="status" tabIndex={-1} className="text-muted wrap-anywhere focus:outline-none">
+        {emptyMessage(query, Boolean(genre || year))}
       </p>
     )
   }
 
+  const showNoNewMatches = noNewMatches && !isLoadingMore
+
   return (
     <section>
       <h2 id={headingId} className="mb-4 text-xl font-bold tracking-tight wrap-anywhere min-[860px]:text-2xl">
-        Results for &quot;{query}&quot;
+        {query ? `Results for "${query}"` : 'Filtered movies'}
       </h2>
 
-      <MovieGrid ref={gridRef} movies={movies} labelledBy={headingId} />
+      {movies.length > 0 && <MovieGrid ref={gridRef} movies={movies} labelledBy={headingId} />}
 
-      <p role="status" className="sr-only">
-        {isLoadingMore ? 'Loading more movies...' : ''}
+      <p role="status" className={showNoNewMatches ? 'mt-6 text-center text-muted' : 'sr-only'}>
+        {isLoadingMore && 'Loading more movies...'}
+        {showNoNewMatches && 'No new matches yet. Load more to keep looking.'}
       </p>
 
       {loadMoreStatus === 'error' && (

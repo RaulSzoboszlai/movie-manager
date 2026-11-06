@@ -78,9 +78,8 @@ export function getUpcomingMovies() {
     return fetchMovieSummaries('/movie/upcoming');
 }
 
-export async function searchMovies(query, page) {
-    const path = '/search/movie';
-    const body = await tmdbGet(path, { query, page });
+async function fetchMoviePage(path, params, page) {
+    const body = await tmdbGet(path, { ...params, page });
     const movies = parseMovieSummaries(body, path);
 
     const totalPages = body.total_pages;
@@ -89,6 +88,26 @@ export async function searchMovies(query, page) {
     }
 
     return { movies, page, totalPages: Math.min(totalPages, MAX_PAGE) };
+}
+
+/**
+ * `query` is '' and `genre` and `year` are null when unset. TMDB's text search can't
+ * filter by genre, so a text search filters each page here: `page` and `totalPages`
+ * still count TMDB's pages, and `movies` can be empty while more pages remain.
+ */
+export async function searchMovies({ query, genre, year, page }) {
+    const yearParam = year === null ? {} : { primary_release_year: year };
+
+    if (query === '') {
+        const genreParam = genre === null ? {} : { with_genres: genre };
+        return fetchMoviePage('/discover/movie', { ...genreParam, ...yearParam }, page);
+    }
+
+    const result = await fetchMoviePage('/search/movie', { query, ...yearParam }, page);
+    if (genre === null) {
+        return result;
+    }
+    return { ...result, movies: result.movies.filter((movie) => movie.genreIds.includes(genre)) };
 }
 
 function isValidGenre(genre) {

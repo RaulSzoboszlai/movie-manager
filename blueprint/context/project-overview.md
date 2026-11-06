@@ -1,6 +1,6 @@
 # Movie Manager - Project Overview
 
-<!-- blueprint:source-hash 30faa01a026279b2adbd9d764f67044b0a3d8c54f09c75884c0e3d6b9e18daa9 -->
+<!-- blueprint:source-hash 596385cda2edd8d1fe41f43b23fbab63e548ac090c0c77117347449a99cd4a93 -->
 
 > A private movie tracker: search TMDB, keep a watchlist, rate what you watched,
 > and organise films into your own lists.
