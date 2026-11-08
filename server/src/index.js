@@ -7,6 +7,7 @@ import authRoutes from './routes/auth.js';
 import libraryRoutes from './routes/library.js';
 import listRoutes from './routes/lists.js';
 import movieRoutes from './routes/movies.js';
+import profileRoutes from './routes/profile.js';
 
 const missing = ['MONGO_URI', 'CLIENT_URL', 'JWT_SECRET', 'TMDB_API_KEY'].filter((name) => !process.env[name]);
 if (missing.length > 0) {
@@ -35,6 +36,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/movies', movieRoutes);
 app.use('/api/library', libraryRoutes);
 app.use('/api/lists', listRoutes);
+app.use('/api/profile', profileRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

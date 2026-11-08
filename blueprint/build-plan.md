@@ -58,7 +58,7 @@ Each item below is one Blueprint feature loop: `/feature` → `/implement` → `
 - [x] **12. Add to list**
   - An "Add to list" menu on cards and the details page.
   - Remove a movie from a list.
-- [ ] **13. Profile stats**
+- [x] **13. Profile stats**
   - `GET /profile/stats` using a MongoDB aggregation.
   - Top genres are counted by `genreIds`, then turned into names with the cached genre list.
   - Profile page with stat cards and the rating distribution.
