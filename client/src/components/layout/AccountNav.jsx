@@ -6,10 +6,12 @@ const LOGOUT_ERROR = 'Could not log out. Please try again.'
 
 const linkBase = 'block rounded-md py-2 text-sm font-medium transition-colors motion-reduce:transition-none'
 
-// Account links use tighter padding on narrow screens so they fit beside the logo at 320px.
+// Account links use tighter padding on narrow screens, in the mobile menu.
 const accountPadding = 'px-2 min-[860px]:px-3'
 
-const navClass = 'ml-auto flex min-w-0 items-center gap-1'
+// In the mobile menu the account controls sit under the main links; on wide screens, at the right.
+const navClass =
+  'flex min-w-0 items-center gap-1 border-t border-border pt-3 empty:hidden min-[860px]:ml-auto min-[860px]:border-t-0 min-[860px]:pt-0'
 
 function loginClass({ isActive }) {
   const state = isActive ? 'bg-accent-soft text-accent' : 'text-muted hover:bg-surface-raised hover:text-text'
@@ -44,7 +46,7 @@ function SignedInAccount({ username, logout }) {
   return (
     <>
       <nav aria-label="Account" className={navClass}>
-        <span title={username} className="max-w-20 truncate px-2 text-sm text-muted min-[860px]:max-w-48">
+        <span title={username} className="max-w-48 truncate px-2 text-sm text-muted">
           {username}
         </span>
         <button
@@ -56,7 +58,7 @@ function SignedInAccount({ username, logout }) {
           {pending ? 'Logging out...' : 'Log out'}
         </button>
       </nav>
-      <div role="alert" className="order-4 basis-full text-right text-sm text-error empty:hidden">
+      <div role="alert" className="text-sm text-error empty:hidden min-[860px]:basis-full min-[860px]:text-right">
         {error}
       </div>
     </>

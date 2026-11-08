@@ -1,4 +1,5 @@
 import { useId, useRef } from 'react'
+import { ProfileSkeleton } from '../components/feedback/Skeletons.jsx'
 import { PRIMARY_BUTTON } from '../components/lists/listStyles.js'
 import RatingDistribution from '../components/profile/RatingDistribution.jsx'
 import StatCard from '../components/profile/StatCard.jsx'
@@ -52,9 +53,12 @@ function ProfilePage() {
         </h2>
 
         {status === 'loading' && (
-          <p role="status" className="text-muted">
-            Loading your stats...
-          </p>
+          <>
+            <p role="status" className="sr-only">
+              Loading your stats...
+            </p>
+            <ProfileSkeleton />
+          </>
         )}
 
         {status === 'error' && (

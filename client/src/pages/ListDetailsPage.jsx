@@ -1,10 +1,13 @@
 import { useId, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
+import EmptyState from '../components/feedback/EmptyState.jsx'
+import { ListDetailsSkeleton } from '../components/feedback/Skeletons.jsx'
 import EditListForm from '../components/lists/EditListForm.jsx'
 import MovieGrid from '../components/movies/MovieGrid.jsx'
 import useLibraryAction, { BUTTON_BASE_CLASS } from '../hooks/useLibraryAction.js'
 import { DANGER_BUTTON, PRIMARY_BUTTON, SECONDARY_BUTTON } from '../components/lists/listStyles.js'
 import useList from '../hooks/useList.js'
+import useToast from '../hooks/useToast.js'
 import { formatMovieCount } from '../lib/lists.js'
 
 const LINK_CLASS = 'text-accent underline underline-offset-2 hover:text-accent-hover'
@@ -18,7 +21,7 @@ function RemoveButton({ movie, listName, onRemove }) {
     <>
       <button
         type="button"
-        onClick={(event) => run(event, () => onRemove(movie.tmdbId))}
+        onClick={(event) => run(event, () => onRemove(movie))}
         onKeyDown={ignoreKeyRepeat}
         aria-label={`Remove ${movie.title} from ${listName}`}
         aria-busy={pending}
@@ -38,6 +41,7 @@ function RemoveButton({ movie, listName, onRemove }) {
 
 function ListDetails({ list, updateList, deleteList, removeMovie }) {
   const navigate = useNavigate()
+  const showToast = useToast()
   const formId = useId()
   const renameRef = useRef(null)
   const [editing, setEditing] = useState(false)
@@ -59,6 +63,7 @@ function ListDetails({ list, updateList, deleteList, removeMovie }) {
     setDeleteError('')
     try {
       await deleteList()
+      showToast(`Deleted list “${list.name}”`)
       navigate('/lists')
     } catch {
       setDeleteError("We couldn't delete this list. Please try again.")
@@ -68,9 +73,10 @@ function ListDetails({ list, updateList, deleteList, removeMovie }) {
 
   // The pressed button disappears with its card, so focus moves to what stays: the
   // Movies heading, or the empty state once the last movie is gone.
-  async function handleRemove(tmdbId) {
+  async function handleRemove(movie) {
     const lastMovie = list.movies.length === 1
-    if (!(await removeMovie(tmdbId))) return
+    if (!(await removeMovie(movie.tmdbId))) return
+    showToast(`Removed “${movie.title}” from “${list.name}”`)
     if (lastMovie) {
       requestAnimationFrame(() => emptyRef.current?.focus())
     } else {
@@ -107,9 +113,11 @@ function ListDetails({ list, updateList, deleteList, removeMovie }) {
       {editing && <EditListForm id={formId} list={list} onSave={updateList} onClose={closeEditor} />}
 
       {list.movies.length === 0 ? (
-        <p ref={emptyRef} tabIndex={-1} className="mt-8 text-muted outline-none">
-          No movies in this list yet.
-        </p>
+        <EmptyState ref={emptyRef} tabIndex={-1} title="No movies in this list yet" className="mt-8">
+          <Link to="/search" className={LINK_CLASS}>
+            Find movies
+          </Link>
+        </EmptyState>
       ) : (
         <section className="mt-8">
           <h2
@@ -150,9 +158,12 @@ function ListDetailsPage() {
 
       <div ref={contentRef} tabIndex={-1} className="mt-4 outline-none">
         {status === 'loading' && (
-          <p role="status" className="text-muted">
-            Loading list...
-          </p>
+          <>
+            <p role="status" className="sr-only">
+              Loading list...
+            </p>
+            <ListDetailsSkeleton />
+          </>
         )}
 
         {status === 'notFound' && (

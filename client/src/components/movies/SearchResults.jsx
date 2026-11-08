@@ -1,5 +1,7 @@
 import { useEffect, useId, useRef } from 'react'
 import useMovieSearch from '../../hooks/useMovieSearch.js'
+import EmptyState from '../feedback/EmptyState.jsx'
+import { MovieGridSkeleton } from '../feedback/Skeletons.jsx'
 import MovieGrid from './MovieGrid.jsx'
 
 const BUTTON_CLASS =
@@ -30,9 +32,12 @@ function SearchResults({ query, genre, year }) {
 
   if (status === 'loading') {
     return (
-      <p role="status" className="text-muted">
-        Searching for movies...
-      </p>
+      <>
+        <p role="status" className="sr-only">
+          Searching for movies...
+        </p>
+        <MovieGridSkeleton />
+      </>
     )
   }
 
@@ -49,9 +54,14 @@ function SearchResults({ query, genre, year }) {
 
   if (movies.length === 0 && !hasMore) {
     return (
-      <p ref={emptyRef} role="status" tabIndex={-1} className="text-muted wrap-anywhere focus:outline-none">
-        {emptyMessage(query, Boolean(genre || year))}
-      </p>
+      <EmptyState
+        ref={emptyRef}
+        role="status"
+        tabIndex={-1}
+        icon="search"
+        title={emptyMessage(query, Boolean(genre || year))}
+        message="Try a different title or change the filters."
+      />
     )
   }
 

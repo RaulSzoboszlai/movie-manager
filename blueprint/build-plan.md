@@ -68,7 +68,7 @@ Each item below is one Blueprint feature loop: `/feature` → `/implement` → `
   - Gradient text on the logo's "Manager" and the page headings, built from the blue accent; soft shadows on cards, panels, menus and dialogs.
   - Movie card actions in one compact row of icon buttons (watchlist, watched, add to list), each with an accessible label and tooltip; the stars get their own line only once the movie is watched.
   - A styling pass over the home, search, details, library, lists, profile and auth pages so they share the new look.
-- [ ] **14. UX polish**
+- [x] **14. UX polish**
   - Loading skeletons, empty states and toast notifications.
   - Responsive navbar (mobile menu) and a pass over keyboard accessibility.
 - [ ] **15. Release prep** (optional)

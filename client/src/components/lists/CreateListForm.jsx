@@ -1,11 +1,19 @@
 import { useId } from 'react'
 import useListForm from '../../hooks/useListForm.js'
+import useToast from '../../hooks/useToast.js'
 import ListFields from './ListFields.jsx'
 import { PRIMARY_BUTTON } from './listStyles.js'
 
 function CreateListForm({ onCreate }) {
   const headingId = useId()
-  const form = useListForm({ submit: onCreate, resetOnSuccess: true })
+  const showToast = useToast()
+  const form = useListForm({
+    submit: async (values) => {
+      await onCreate(values)
+      showToast(`Created list “${values.name}”`)
+    },
+    resetOnSuccess: true,
+  })
 
   return (
     <form

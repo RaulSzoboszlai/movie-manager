@@ -1,5 +1,7 @@
 import { useId, useRef } from 'react'
 import { Link } from 'react-router-dom'
+import EmptyState from '../components/feedback/EmptyState.jsx'
+import { ListCardsSkeleton } from '../components/feedback/Skeletons.jsx'
 import CreateListForm from '../components/lists/CreateListForm.jsx'
 import { PRIMARY_BUTTON } from '../components/lists/listStyles.js'
 import useLists from '../hooks/useLists.js'
@@ -32,9 +34,12 @@ function ListsPage() {
         </h2>
 
         {status === 'loading' && (
-          <p role="status" className="text-muted">
-            Loading your lists...
-          </p>
+          <>
+            <p role="status" className="sr-only">
+              Loading your lists...
+            </p>
+            <ListCardsSkeleton />
+          </>
         )}
 
         {status === 'error' && (
@@ -47,7 +52,7 @@ function ListsPage() {
         )}
 
         {status === 'ready' && lists.length === 0 && (
-          <p className="text-muted">No lists yet. Create your first one above.</p>
+          <EmptyState icon="list" title="No lists yet" message="Create your first one above." />
         )}
 
         {status === 'ready' && lists.length > 0 && (

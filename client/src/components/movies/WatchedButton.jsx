@@ -1,4 +1,5 @@
 import useLibrary from '../../hooks/useLibrary.js'
+import useToast from '../../hooks/useToast.js'
 import useLibraryAction, { ACTION_ERROR_CLASS, BUTTON_IDLE_CLASS, actionButtonClass } from '../../hooks/useLibraryAction.js'
 import { ActionLabel, WatchedIcon } from './ActionIcons.jsx'
 
@@ -7,6 +8,7 @@ const WATCHED_CLASS = 'border-watched bg-watched-soft text-watched'
 function WatchedButton({ movie, compact = false }) {
   const { movies, add, update } = useLibrary()
   const { pending, failed, run, ignoreKeyRepeat } = useLibraryAction()
+  const showToast = useToast()
 
   const { tmdbId, title } = movie
   const saved = movies.find((savedMovie) => savedMovie.tmdbId === tmdbId)
@@ -23,9 +25,16 @@ function WatchedButton({ movie, compact = false }) {
     return update(tmdbId, { status: 'want' })
   }
 
-  function toggle() {
-    if (watched) return moveBack()
-    return saved ? update(tmdbId, { status: 'watched' }) : add(movie, 'watched')
+  async function toggle() {
+    if (watched) {
+      const request = moveBack()
+      if (!request) return
+      await request
+      showToast(`Moved “${title}” back to Want to watch`)
+      return
+    }
+    await (saved ? update(tmdbId, { status: 'watched' }) : add(movie, 'watched'))
+    showToast(`Marked “${title}” as watched`)
   }
 
   return (

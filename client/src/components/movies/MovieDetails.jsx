@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import useMovieDetails from '../../hooks/useMovieDetails.js'
+import { MovieDetailsSkeleton } from '../feedback/Skeletons.jsx'
 import CastRow from './CastRow.jsx'
 import MovieHero from './MovieHero.jsx'
 import MovieSection from './MovieSection.jsx'
@@ -10,9 +11,12 @@ function MovieDetails({ tmdbId }) {
 
   if (status === 'loading') {
     return (
-      <p role="status" className="text-muted">
-        Loading movie...
-      </p>
+      <>
+        <p role="status" className="sr-only">
+          Loading movie...
+        </p>
+        <MovieDetailsSkeleton />
+      </>
     )
   }
 

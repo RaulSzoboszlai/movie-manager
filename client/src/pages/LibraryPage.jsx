@@ -1,5 +1,7 @@
 import { useEffect, useId, useRef } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
+import EmptyState from '../components/feedback/EmptyState.jsx'
+import { MovieGridSkeleton } from '../components/feedback/Skeletons.jsx'
 import MovieGrid from '../components/movies/MovieGrid.jsx'
 import useLibrary from '../hooks/useLibrary.js'
 
@@ -105,9 +107,12 @@ function LibraryPage() {
         className="mt-6 outline-none"
       >
         {status === 'loading' && (
-          <p role="status" className="text-muted">
-            Loading your library...
-          </p>
+          <>
+            <p role="status" className="sr-only">
+              Loading your library...
+            </p>
+            <MovieGridSkeleton />
+          </>
         )}
 
         {status === 'error' && (
@@ -124,12 +129,11 @@ function LibraryPage() {
         )}
 
         {status === 'ready' && list.length === 0 && (
-          <p className="text-muted">
-            {selected === 'watched' ? 'Nothing watched yet.' : 'Nothing on your watchlist yet.'}{' '}
+          <EmptyState title={selected === 'watched' ? 'Nothing watched yet' : 'Nothing on your watchlist yet'}>
             <Link to="/search" className="text-accent underline underline-offset-2 hover:text-accent-hover">
               Find a movie
             </Link>
-          </p>
+          </EmptyState>
         )}
 
         {status === 'ready' && list.length > 0 && <MovieGrid movies={list} labelledBy={tabIds[selected]} />}

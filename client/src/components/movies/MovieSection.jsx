@@ -1,5 +1,7 @@
 import { useId } from 'react'
 import useMovieList from '../../hooks/useMovieList.js'
+import EmptyState from '../feedback/EmptyState.jsx'
+import { MovieRowSkeleton } from '../feedback/Skeletons.jsx'
 import MovieRow from './MovieRow.jsx'
 
 function MovieSection({ path, heading, noun, subheading, ranked = false }) {
@@ -19,9 +21,12 @@ function MovieSection({ path, heading, noun, subheading, ranked = false }) {
       </header>
 
       {status === 'loading' && (
-        <p role="status" className="text-muted">
-          Loading {noun} movies...
-        </p>
+        <>
+          <p role="status" className="sr-only">
+            Loading {noun} movies...
+          </p>
+          <MovieRowSkeleton ranked={ranked} />
+        </>
       )}
 
       {status === 'error' && (
@@ -37,7 +42,7 @@ function MovieSection({ path, heading, noun, subheading, ranked = false }) {
         </div>
       )}
 
-      {status === 'ready' && movies.length === 0 && <p className="text-muted">No {noun} movies right now.</p>}
+      {status === 'ready' && movies.length === 0 && <EmptyState compact title={`No ${noun} movies right now`} />}
 
       {status === 'ready' && movies.length > 0 && <MovieRow movies={movies} labelledBy={headingId} ranked={ranked} />}
     </section>

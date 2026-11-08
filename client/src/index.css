@@ -60,6 +60,13 @@
     cursor: pointer;
   }
 
+  /* One focus ring for every focusable element; components that draw their own ring
+     elsewhere (movie cards draw it on the poster) opt out with outline-none. */
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
   body {
     background-color: var(--color-bg);
     color: var(--color-text);

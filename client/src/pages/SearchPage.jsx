@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import FormField from '../components/auth/FormField.jsx'
+import EmptyState from '../components/feedback/EmptyState.jsx'
 import FilterSelect from '../components/movies/FilterSelect.jsx'
 import SearchResults from '../components/movies/SearchResults.jsx'
 import useGenres from '../hooks/useGenres.js'
@@ -137,7 +138,7 @@ function SearchPage() {
         {query || genre || year ? (
           <SearchResults key={JSON.stringify([query, genre, year])} query={query} genre={genre} year={year} />
         ) : (
-          <p className="text-muted">Type a movie title or choose a filter to search.</p>
+          <EmptyState icon="search" title="Find a movie" message="Type a movie title or choose a filter to search." />
         )}
       </div>
     </>
