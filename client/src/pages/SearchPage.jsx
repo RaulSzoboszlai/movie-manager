@@ -89,7 +89,7 @@ function SearchPage() {
 
   return (
     <>
-      <h1 className="text-3xl font-bold tracking-tight min-[860px]:text-4xl">Search</h1>
+      <h1 className="text-gradient text-3xl font-bold tracking-tight min-[860px]:text-4xl">Search</h1>
 
       <form role="search" onSubmit={handleSubmit} className="mt-4 max-w-xl">
         <FormField

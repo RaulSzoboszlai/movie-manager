@@ -11,7 +11,7 @@ function MovieSection({ path, heading, noun, subheading, ranked = false }) {
       <header className={subheading ? 'mb-6' : 'mb-4'}>
         <h2
           id={headingId}
-          className={`font-bold tracking-tight ${ranked ? 'text-3xl min-[860px]:text-4xl' : 'text-xl min-[860px]:text-2xl'}`}
+          className={`font-bold tracking-tight ${ranked ? 'text-gradient text-3xl min-[860px]:text-4xl' : 'text-xl min-[860px]:text-2xl'}`}
         >
           {heading}
         </h2>

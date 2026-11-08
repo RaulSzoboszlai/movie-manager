@@ -5,7 +5,7 @@ function TopGenres({ genres }) {
   const headingId = useId()
 
   return (
-    <section aria-labelledby={headingId} className="rounded-card border border-border bg-surface p-4">
+    <section aria-labelledby={headingId} className="rounded-card border border-border bg-surface p-4 shadow-soft">
       <h2 id={headingId} className="text-lg font-bold">
         Top genres
       </h2>

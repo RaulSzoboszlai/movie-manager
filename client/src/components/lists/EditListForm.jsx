@@ -31,7 +31,7 @@ function EditListForm({ id, list, onSave, onClose }) {
       aria-label="Rename list"
       onSubmit={form.handleSubmit}
       onKeyDown={handleKeyDown}
-      className="mt-6 space-y-4 rounded-card border border-border bg-surface p-4 min-[860px]:p-6"
+      className="mt-6 space-y-4 rounded-card border border-border bg-surface p-4 shadow-soft min-[860px]:p-6"
     >
       <ListFields form={form} nameRef={nameRef} />
       <div className="flex flex-wrap gap-2">

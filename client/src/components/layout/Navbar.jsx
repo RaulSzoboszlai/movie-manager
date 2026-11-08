@@ -21,7 +21,7 @@ function Navbar() {
     <header className="border-b border-border bg-surface">
       <div className="mx-auto flex w-full max-w-304 flex-wrap items-center gap-x-1 gap-y-2 px-4 py-3 min-[860px]:gap-x-6 min-[860px]:px-6">
         <Link to="/" className="text-xl font-bold">
-          Movie<span className="text-accent">Manager</span>
+          Movie<span className="text-gradient inline-block">Manager</span>
         </Link>
 
         <nav aria-label="Main" className="order-3 basis-full min-[860px]:order-none min-[860px]:basis-auto">

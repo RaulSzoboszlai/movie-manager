@@ -18,7 +18,7 @@ function ListsPage() {
 
   return (
     <>
-      <h1 className="text-3xl font-bold tracking-tight min-[860px]:text-4xl">My lists</h1>
+      <h1 className="text-gradient text-3xl font-bold tracking-tight min-[860px]:text-4xl">My lists</h1>
 
       {status === 'ready' && (
         <div className="mt-6 max-w-xl">
@@ -56,7 +56,7 @@ function ListsPage() {
               <li key={list.id}>
                 <Link
                   to={`/lists/${list.id}`}
-                  className="block rounded-card border border-border bg-surface p-4 transition-colors hover:border-border-strong hover:bg-surface-raised focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent motion-reduce:transition-none"
+                  className="block rounded-card border border-border bg-surface p-4 shadow-soft transition-colors hover:border-border-strong hover:bg-surface-raised focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent motion-reduce:transition-none"
                 >
                   <span className="block font-bold break-words">{list.name}</span>
                   <span className="mt-1 block text-sm text-muted">{formatMovieCount(list.movieCount)}</span>

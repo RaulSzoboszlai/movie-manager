@@ -80,7 +80,7 @@ function ListDetails({ list, updateList, deleteList, removeMovie }) {
 
   return (
     <>
-      <h1 className="text-3xl font-bold tracking-tight break-words min-[860px]:text-4xl">{list.name}</h1>
+      <h1 className="text-gradient text-3xl font-bold tracking-tight break-words min-[860px]:text-4xl">{list.name}</h1>
       {list.description && <p className="mt-2 break-words text-muted">{list.description}</p>}
       <p className="mt-1 text-sm text-muted">{formatMovieCount(list.movies.length)}</p>
 
@@ -157,7 +157,7 @@ function ListDetailsPage() {
 
         {status === 'notFound' && (
           <>
-            <h1 className="text-3xl font-bold tracking-tight min-[860px]:text-4xl">List not found</h1>
+            <h1 className="text-gradient text-3xl font-bold tracking-tight min-[860px]:text-4xl">List not found</h1>
             <p className="mt-2 text-muted">
               This list doesn&apos;t exist or was deleted.{' '}
               <Link to="/lists" className={LINK_CLASS}>

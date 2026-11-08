@@ -75,7 +75,7 @@ function LibraryPage() {
 
   return (
     <>
-      <h1 className="text-3xl font-bold tracking-tight min-[860px]:text-4xl">My library</h1>
+      <h1 className="text-gradient text-3xl font-bold tracking-tight min-[860px]:text-4xl">My library</h1>
 
       <div role="tablist" aria-label="Library" className="mt-6 flex gap-4 border-b border-border">
         {TABS.map(({ key, label }, index) => (

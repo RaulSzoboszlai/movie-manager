@@ -19,7 +19,7 @@ function MovieDetails({ tmdbId }) {
   if (status === 'notFound') {
     return (
       <>
-        <h1 className="text-3xl font-bold tracking-tight min-[860px]:text-4xl">Movie not found</h1>
+        <h1 className="text-gradient text-3xl font-bold tracking-tight min-[860px]:text-4xl">Movie not found</h1>
         <p className="mt-1 text-muted">
           We couldn&apos;t find this movie.{' '}
           <Link to="/" className="text-accent underline underline-offset-2 hover:text-accent-hover">

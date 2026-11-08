@@ -44,7 +44,7 @@ function ProfilePage() {
 
   return (
     <>
-      <h1 className="text-3xl font-bold tracking-tight min-[860px]:text-4xl">Profile</h1>
+      <h1 className="text-gradient text-3xl font-bold tracking-tight min-[860px]:text-4xl">Profile</h1>
 
       <section ref={sectionRef} tabIndex={-1} aria-labelledby={headingId} className="mt-6 outline-none">
         <h2 id={headingId} className="sr-only">

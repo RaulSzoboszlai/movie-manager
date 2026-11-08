@@ -12,7 +12,7 @@ function CreateListForm({ onCreate }) {
       noValidate
       aria-labelledby={headingId}
       onSubmit={form.handleSubmit}
-      className="space-y-4 rounded-card border border-border bg-surface p-4 min-[860px]:p-6"
+      className="space-y-4 rounded-card border border-border bg-surface p-4 shadow-soft min-[860px]:p-6"
     >
       <h2 id={headingId} className="text-lg font-bold">
         New list

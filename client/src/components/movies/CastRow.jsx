@@ -22,7 +22,7 @@ function CastRow({ cast }) {
         >
           {cast.map(({ id, name, character, profilePath }) => (
             <li key={id} className="w-28 flex-none sm:w-32">
-              <div className="aspect-2/3 overflow-hidden rounded-card border border-border bg-surface-raised">
+              <div className="aspect-2/3 overflow-hidden rounded-card border border-border bg-surface-raised shadow-soft">
                 {profilePath && (
                   <img
                     src={`${PROFILE_BASE_URL}${profilePath}`}

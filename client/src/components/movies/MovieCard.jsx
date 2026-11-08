@@ -20,7 +20,7 @@ function MovieCard({ movie, rank, controls }) {
               {rank}
             </span>
           )}
-          <div className="relative z-10 ml-(--offset) aspect-2/3 overflow-hidden rounded-card border border-border bg-surface-raised transition duration-150 group-hover:-translate-y-1 group-hover:border-border-strong group-hover:shadow-lift group-focus-visible:outline-2 group-focus-visible:outline-offset-2 group-focus-visible:outline-accent motion-reduce:transition-none motion-reduce:group-hover:translate-y-0">
+          <div className="relative z-10 ml-(--offset) aspect-2/3 overflow-hidden rounded-card border border-border bg-surface-raised shadow-soft transition duration-150 group-hover:-translate-y-1 group-hover:border-border-strong group-hover:shadow-lift group-focus-visible:outline-2 group-focus-visible:outline-offset-2 group-focus-visible:outline-accent motion-reduce:transition-none motion-reduce:group-hover:translate-y-0">
             {posterPath ? (
               <img
                 src={`${POSTER_BASE_URL}${posterPath}`}
@@ -31,18 +31,23 @@ function MovieCard({ movie, rank, controls }) {
             ) : (
               <span
                 aria-hidden="true"
-                className="flex h-full items-end p-2 text-xs leading-tight font-bold wrap-anywhere sm:p-3 sm:text-sm"
+                className="flex h-full items-center justify-center p-2 text-center text-xs font-medium text-muted sm:p-3 sm:text-sm"
               >
-                {title}
+                No poster available
               </span>
             )}
           </div>
         </div>
-        <h3 className="mt-3 ml-(--offset) text-sm leading-tight font-medium wrap-anywhere">{title}</h3>
+        {/* Two title lines and the year line are always reserved, so the buttons line up across a row. */}
+        <h3 className="mt-3 ml-(--offset) line-clamp-2 min-h-[2lh] text-sm leading-tight font-medium wrap-anywhere">
+          {title}
+        </h3>
       </Link>
-      {typeof releaseYear === 'number' && <p className="mt-1 ml-(--offset) text-xs text-muted">{releaseYear}</p>}
-      <div className="mt-auto ml-(--offset) pt-3">
-        {controls ?? <LibraryControls movie={movie} />}
+      <p className="mt-1 ml-(--offset) min-h-4 text-xs text-muted">
+        {typeof releaseYear === 'number' ? releaseYear : ''}
+      </p>
+      <div className="ml-(--offset) pt-3">
+        {controls ?? <LibraryControls movie={movie} compact />}
       </div>
     </article>
   )

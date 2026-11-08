@@ -16,11 +16,11 @@ function LoginPage() {
 
   return (
     <div className="mx-auto w-full max-w-sm">
-      <h1 className="text-3xl font-bold tracking-tight min-[860px]:text-4xl">Log in</h1>
+      <h1 className="text-gradient text-3xl font-bold tracking-tight min-[860px]:text-4xl">Log in</h1>
       <form
         noValidate
         onSubmit={handleSubmit}
-        className="mt-6 space-y-4 rounded-card border border-border bg-surface p-4 min-[860px]:p-6"
+        className="mt-6 space-y-4 rounded-card border border-border bg-surface p-4 shadow-soft min-[860px]:p-6"
       >
         <div role="alert" className="text-sm text-error empty:hidden">
           {formError}

@@ -1,7 +1,8 @@
 import { useId, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import useListMembership from '../../hooks/useListMembership.js'
-import { BUTTON_BASE_CLASS, BUTTON_IDLE_CLASS } from '../../hooks/useLibraryAction.js'
+import { BUTTON_IDLE_CLASS, actionButtonClass } from '../../hooks/useLibraryAction.js'
+import { ActionLabel, ListPlusIcon } from '../movies/ActionIcons.jsx'
 import { PRIMARY_BUTTON, SECONDARY_BUTTON } from './listStyles.js'
 
 const LINK_CLASS = 'text-accent underline underline-offset-2 hover:text-accent-hover'
@@ -44,7 +45,7 @@ function ListCheckbox({ list, onToggle }) {
   )
 }
 
-function AddToListButton({ movie }) {
+function AddToListButton({ movie, compact = false }) {
   const { status, lists, load, toggle } = useListMembership(movie)
   const dialogRef = useRef(null)
   const triggerRef = useRef(null)
@@ -77,9 +78,12 @@ function AddToListButton({ movie }) {
         onClick={open}
         aria-haspopup="dialog"
         aria-label={`Add to list: ${movie.title}`}
-        className={`${BUTTON_BASE_CLASS} ${BUTTON_IDLE_CLASS}`}
+        className={`${actionButtonClass(compact)} ${BUTTON_IDLE_CLASS}`}
       >
-        <span aria-hidden="true">+</span> Add to list
+        <ListPlusIcon />
+        <ActionLabel compact={compact} align="end">
+          Add to list
+        </ActionLabel>
       </button>
 
       <dialog
@@ -87,7 +91,7 @@ function AddToListButton({ movie }) {
         aria-labelledby={headingId}
         onClose={handleClose}
         onClick={handleDialogClick}
-        className="m-auto w-[min(24rem,calc(100vw-2rem))] rounded-card border border-border bg-surface p-0 text-text backdrop:bg-bg/70"
+        className="m-auto w-[min(24rem,calc(100vw-2rem))] rounded-card border border-border bg-surface p-0 text-text shadow-soft backdrop:bg-bg/70"
       >
         <div className="p-5">
           <h2 id={headingId} className="text-lg font-bold wrap-anywhere">

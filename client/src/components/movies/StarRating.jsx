@@ -4,6 +4,12 @@ import useLibraryAction from '../../hooks/useLibraryAction.js'
 
 const STARS = [1, 2, 3, 4, 5]
 
+// Hovering a star previews that rating: every star lights up while the pointer is over
+// the group, then the stars after the hovered one go dark again. Pointer devices only,
+// so a tap on a touch screen does not leave a stuck preview.
+const HOVER_PREVIEW_CLASS =
+  '[@media(hover:hover)]:[&:hover>button]:text-star-on [@media(hover:hover)]:[&>button:hover~button]:text-star-off'
+
 function StarRating({ movie }) {
   const { movies, update } = useLibrary()
   const { pending, failed, run, ignoreKeyRepeat } = useLibraryAction()
@@ -23,7 +29,7 @@ function StarRating({ movie }) {
         aria-label={`Your rating for ${title}: ${summary}`}
         aria-busy={pending}
         aria-describedby={watched ? undefined : hintId}
-        className="flex"
+        className={`flex ${watched && !pending ? HOVER_PREVIEW_CLASS : ''}`}
       >
         {STARS.map((star) => {
           const current = star === rating
@@ -40,7 +46,7 @@ function StarRating({ movie }) {
               title={current ? label : undefined}
               aria-pressed={current}
               aria-disabled={pending || undefined}
-              className={`size-6 flex-none rounded-sm text-base leading-none transition-colors focus-visible:outline-2 focus-visible:outline-accent motion-reduce:transition-none ${rating !== null && star <= rating ? 'text-star-on' : 'text-star-off'} ${!watched || pending ? 'cursor-default' : 'hover:text-star-on'} ${pending ? 'opacity-60' : ''}`}
+              className={`size-6 flex-none rounded-sm text-base leading-none transition-colors focus-visible:outline-2 focus-visible:outline-accent motion-reduce:transition-none ${rating !== null && star <= rating ? 'text-star-on' : 'text-star-off'} ${!watched || pending ? 'cursor-default' : ''} ${pending ? 'opacity-60' : ''}`}
             >
               <span aria-hidden="true">★</span>
             </button>

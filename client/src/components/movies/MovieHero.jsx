@@ -26,19 +26,22 @@ function MovieHero({ movie }) {
 
       <div className={`flex flex-col gap-6 min-[860px]:flex-row ${backdropPath ? 'px-4 min-[860px]:px-8' : ''}`}>
         <div
-          className={`relative aspect-2/3 w-32 flex-none self-start overflow-hidden rounded-card border border-border bg-surface-raised min-[860px]:w-48 ${backdropPath ? '-mt-16 min-[860px]:-mt-24' : ''}`}
+          className={`relative aspect-2/3 w-32 flex-none self-start overflow-hidden rounded-card border border-border bg-surface-raised shadow-soft min-[860px]:w-48 ${backdropPath ? '-mt-16 min-[860px]:-mt-24' : ''}`}
         >
           {posterPath ? (
             <img src={`${POSTER_BASE_URL}${posterPath}`} alt="" className="h-full w-full object-cover" />
           ) : (
-            <span aria-hidden="true" className="flex h-full items-end p-3 text-sm leading-tight font-bold wrap-anywhere">
-              {title}
+            <span
+              aria-hidden="true"
+              className="flex h-full items-center justify-center p-3 text-center text-sm font-medium text-muted"
+            >
+              No poster available
             </span>
           )}
         </div>
 
         <div className={`min-w-0 ${backdropPath ? 'min-[860px]:pt-6' : ''}`}>
-          <h1 className="text-3xl font-bold tracking-tight wrap-anywhere min-[860px]:text-4xl">{title}</h1>
+          <h1 className="text-gradient text-3xl font-bold tracking-tight wrap-anywhere min-[860px]:text-4xl">{title}</h1>
 
           {facts.length > 0 && <p className="mt-2 text-muted">{facts.join(' · ')}</p>}
 
@@ -55,7 +58,7 @@ function MovieHero({ movie }) {
             </ul>
           )}
 
-          <div className="mt-4 w-40">
+          <div className="mt-4">
             <LibraryControls movie={snapshot} alwaysShowRating />
           </div>
 
