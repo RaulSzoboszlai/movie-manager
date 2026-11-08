@@ -1,6 +1,6 @@
 # Movie Manager - Project Overview
 
-<!-- blueprint:source-hash 84a4d5d406fd5109dbc0ded717882d58dce6b0e693aec2d0a59c524b00662a72 -->
+<!-- blueprint:source-hash 3f87864e1e00134c6a80c48c6c08d4bc98219f474344bb55599c5ea349040c8c -->
 
 > A private movie tracker: search TMDB, keep a watchlist, rate what you watched,
 > and organise films into your own lists.
@@ -84,6 +84,9 @@ In `build-plan.md` order. One Blueprint feature loop each.
 
 **Phase 5 - Polish**
 
+14a. **Visual refresh** - built before 14: gradient accent text (logo "Manager",
+    page headings), soft shadows on raised surfaces, movie card actions as one
+    compact row of labelled icon buttons, and a styling pass over every page.
 14. **UX polish** - loading skeletons, empty states, toasts, responsive navbar,
     keyboard accessibility pass.
 15. **Release prep** (optional) - production cookie settings, environment check,
@@ -291,8 +294,10 @@ Dark and cinematic, so posters stand out. Inter throughout (400, 500, 700, 900) 
 | Watched, soft tint | `#5fd39a`, `rgba(95, 211, 154, 0.14)` |
 | Error | `#ff6b6b` |
 | Stars, filled and empty | gold `#f5b301`, `#56607a` |
+| Accent gradient (text only) | `#4da3ff` to `#7dbcff` |
 
-- **Movie cards:** 2:3 poster with a thin border and 10px corners, then title and year, then the watchlist and watched buttons, or the watched state with stars once the movie is watched. Hover lifts the poster; the focus ring sits on the poster.
+- **Gradients and depth:** accent text such as the logo's "Manager" and page headings uses the accent gradient; body text stays solid. Cards, panels, menus and dialogs get soft shadows.
+- **Movie cards:** 2:3 poster with a thin border and 10px corners, then title and year, then one compact row of icon buttons (watchlist, watched, add to list), with the stars on their own line once the movie is watched. Hover lifts the poster; the focus ring sits on the poster.
 - **Top 10 row:** one sideways-scrolling row, never a grid. A huge outlined rank number in the page color stands behind the left edge of each poster, and its outline turns blue on hover. All numbers are the same size, so the "10" card is wider. Titles and buttons line up under the poster. Only the row scrolls, never the page.
 
 ## Deployment

@@ -192,8 +192,10 @@ The look was chosen with a prototype, and this section keeps it after the protot
   - watched state: green `#5fd39a`, soft tint `rgba(95, 211, 154, 0.14)`
   - error: `#ff6b6b`
 - **Stars:** gold `#f5b301` when filled, `#56607a` when empty. Stars stay gold even though the accent is blue.
+- **Gradients:** accent text such as the logo's "Manager" and page headings uses a blue gradient from `#4da3ff` to `#7dbcff`. Body text stays solid for readability.
+- **Depth:** raised surfaces (cards, panels, menus and dialogs) get soft shadows, and posters keep their hover lift.
 - **Font:** Inter for everything (weights 400, 500, 700 and 900), falling back to the system sans.
-- **Movie cards:** a 2:3 poster with a thin border and 10px corners, then the title and year, then the watchlist and watched buttons, or the watched state with stars once the movie is watched. On hover the poster lifts slightly. The keyboard focus ring sits on the poster.
+- **Movie cards:** a 2:3 poster with a thin border and 10px corners, then the title and year, then one compact row of icon buttons (watchlist, watched, add to list), with the stars on their own line once the movie is watched. On hover the poster lifts slightly. The keyboard focus ring sits on the poster.
 - **Top 10 row:** one row that scrolls sideways, not a grid. Each card has a huge outlined rank number in the page color, standing behind the left edge of the poster, with the poster covering part of it. The outline turns blue on hover. All numbers are the same size, so the "10" card is wider. Titles and buttons line up under the poster. Only the row scrolls, never the page.
 
 ## Conventions
