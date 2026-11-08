@@ -49,7 +49,23 @@ function useList(id) {
     }
   }
 
-  return { ...result, retry, updateList, deleteList }
+  // Returns false when the list itself is gone, so the page switches to its not-found state.
+  async function removeMovie(tmdbId) {
+    try {
+      await api.delete(`/lists/${id}/movies/${tmdbId}`)
+    } catch (err) {
+      if (err.response?.status !== 404) throw err
+      setResult(NOT_FOUND)
+      return false
+    }
+    setResult((current) => ({
+      ...current,
+      list: { ...current.list, movies: current.list.movies.filter((movie) => movie.tmdbId !== tmdbId) },
+    }))
+    return true
+  }
+
+  return { ...result, retry, updateList, deleteList, removeMovie }
 }
 
 export default useList

@@ -1,6 +1,8 @@
 import mongoose from 'mongoose';
 import { httpError } from '../middleware/errorHandler.js';
 import List from '../models/List.js';
+import { parseBodyTmdbId, parsePosterPath, parseTitle } from './libraryController.js';
+import { parseTmdbId } from './movieController.js';
 
 const MAX_NAME_LENGTH = 60;
 const MAX_DESCRIPTION_LENGTH = 500;
@@ -52,8 +54,17 @@ function toList(doc) {
 }
 
 export async function listLists(req, res) {
+    const query = req.query.tmdbId;
+    // A repeated parameter arrives as an array, which parseTmdbId's pattern test rejects.
+    const tmdbId = query === undefined || query === '' ? null : parseTmdbId(typeof query === 'string' ? query : '');
+
     const docs = await List.find({ user: req.userId }).sort({ createdAt: -1, _id: -1 });
-    res.json({ lists: docs.map(toListSummary) });
+    const lists = docs.map((doc) =>
+        tmdbId === null
+            ? toListSummary(doc)
+            : { ...toListSummary(doc), hasMovie: doc.movies.some((movie) => movie.tmdbId === tmdbId) },
+    );
+    res.json({ lists });
 }
 
 export async function createList(req, res) {
@@ -99,6 +110,41 @@ export async function deleteList(req, res) {
         ? await List.deleteOne({ _id: req.params.id, user: req.userId })
         : { deletedCount: 0 };
     if (result.deletedCount === 0) {
+        throw httpError(404, 'List not found');
+    }
+    res.status(204).end();
+}
+
+export async function addListMovie(req, res) {
+    const body = req.body ?? {};
+    const tmdbId = parseBodyTmdbId(body.tmdbId);
+    const title = parseTitle(body.title);
+    const posterPath = parsePosterPath(body.posterPath ?? null);
+
+    // The $ne filter and the $push run as one update, so two concurrent adds cannot both insert.
+    const added = mongoose.isValidObjectId(req.params.id)
+        ? await List.findOneAndUpdate(
+              { _id: req.params.id, user: req.userId, 'movies.tmdbId': { $ne: tmdbId } },
+              { $push: { movies: { $each: [{ tmdbId, title, posterPath, addedAt: new Date() }], $position: 0 } } },
+              { new: true },
+          )
+        : null;
+    if (added) {
+        res.status(201).json({ list: toList(added) });
+        return;
+    }
+
+    // No match: either the list is missing (404) or the movie is already in it.
+    const doc = await findOwnList(req.params.id, req.userId);
+    res.json({ list: toList(doc) });
+}
+
+export async function removeListMovie(req, res) {
+    const tmdbId = parseTmdbId(req.params.tmdbId);
+    const doc = mongoose.isValidObjectId(req.params.id)
+        ? await List.findOneAndUpdate({ _id: req.params.id, user: req.userId }, { $pull: { movies: { tmdbId } } })
+        : null;
+    if (!doc) {
         throw httpError(404, 'List not found');
     }
     res.status(204).end();

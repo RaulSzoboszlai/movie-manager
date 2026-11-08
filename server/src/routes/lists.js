@@ -1,5 +1,13 @@
 import { Router } from 'express';
-import { createList, deleteList, getList, listLists, updateList } from '../controllers/listController.js';
+import {
+    addListMovie,
+    createList,
+    deleteList,
+    getList,
+    listLists,
+    removeListMovie,
+    updateList,
+} from '../controllers/listController.js';
 import { requireAuth } from '../middleware/requireAuth.js';
 
 const router = Router();
@@ -11,5 +19,7 @@ router.post('/', createList);
 router.get('/:id', getList);
 router.patch('/:id', updateList);
 router.delete('/:id', deleteList);
+router.post('/:id/movies', addListMovie);
+router.delete('/:id/movies/:tmdbId', removeListMovie);
 
 export default router;

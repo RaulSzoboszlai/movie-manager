@@ -1,3 +1,4 @@
+import AddToListButton from '../lists/AddToListButton.jsx'
 import useLibrary from '../../hooks/useLibrary.js'
 import StarRating from './StarRating.jsx'
 import WatchedButton from './WatchedButton.jsx'
@@ -17,6 +18,7 @@ function LibraryControls({ movie, alwaysShowRating = false }) {
       {!watched && <WatchlistButton movie={movie} />}
       {ready && <WatchedButton movie={movie} />}
       {ready && (watched || alwaysShowRating) && <StarRating movie={movie} />}
+      <AddToListButton movie={movie} />
     </div>
   )
 }

@@ -69,7 +69,7 @@
 **Found:** 2026-11-06 by /audit independent (scope: current; lens: quality)
 **Why it matters:** This feature adds a sixth copy of the same alert, button markup and long class string, alongside ProtectedRoute.jsx:22, MovieSection.jsx:28, MovieDetails.jsx:35, SearchPage.jsx:107 and SearchResults.jsx:41. The focus defects F-05 and F-09 live in this markup, and the coding standards ask for shared primitives as local components, so the outstanding fix would have to be repeated in each copy and the copies have already started to differ, with only the library page handling focus. Nothing is broken today.
 **Suggested fix:** Extract a small local retry component that takes the message and the retry handler, and fix F-05 and F-09 there. The library page keeps its focus handling through the handler it passes. No current requirement would be lost.
-**Resolution:** Re-examined by /audit independent at 2b11445 and still open. Feature 10 moved the library page's copy from line 61 to line 113 without adding another copy. The spec leaves this finding out of scope. Re-examined by /audit independent at 7d1db4c and still open: feature 11 adds two more copies at client/src/pages/ListsPage.jsx:41 and client/src/pages/ListDetailsPage.jsx:107. Both move focus to a container that stays mounted before retrying, so they avoid the F-05/F-09 focus loss, and they take the button classes from client/src/components/lists/listStyles.js, so the copies now differ further. A shared retry component would also replace those two.
+**Resolution:** Re-examined by /audit independent at 2b11445 and still open. Feature 10 moved the library page's copy from line 61 to line 113 without adding another copy. The spec leaves this finding out of scope. Re-examined by /audit independent at 7d1db4c and still open: feature 11 adds two more copies at client/src/pages/ListsPage.jsx:41 and client/src/pages/ListDetailsPage.jsx:107. Both move focus to a container that stays mounted before retrying, so they avoid the F-05/F-09 focus loss, and they take the button classes from client/src/components/lists/listStyles.js, so the copies now differ further. A shared retry component would also replace those two. Re-examined by /audit independent at ba72d08 and still open: feature 12 adds another copy in the Add to list dialog at client/src/components/lists/AddToListButton.jsx:105, and this one has the F-05/F-09 focus loss (see F-23).
 
 ### F-19 [P3] open - Button class strings are exported from the action hook
 
@@ -77,7 +77,7 @@
 **Found:** 2026-11-06 by /audit independent (scope: current; lens: quality)
 **Why it matters:** `BUTTON_BASE_CLASS` and `BUTTON_IDLE_CLASS` have nothing to do with pending or failure handling, yet `WatchlistButton` and `WatchedButton` import them from this hook file. The coding standards keep hooks for reusable logic and the spec asks to keep this hook small, listing only `pending`, `failed` and the two repeat guards. The next control that wants the button look will have to import styling from a state hook. Nothing is broken today.
 **Suggested fix:** Move the two constants to a small module beside the buttons, such as client/src/components/movies/libraryButtonClasses.js, and import them from there. No current requirement would be lost.
-**Resolution:**
+**Resolution:** Re-examined by /audit independent at ba72d08 and still open. Feature 12's spec asks for these classes, so two more files now import styling from the hook: client/src/components/lists/AddToListButton.jsx:4 and client/src/pages/ListDetailsPage.jsx:5. Moving the constants would mean updating four importers instead of two.
 
 ### F-20 [P3] open - The status check is written twice in the library controller
 
@@ -89,11 +89,11 @@
 
 ### F-21 [P3] open - A source comment cites a ledger ID that will not stay valid
 
-**File:** server/src/controllers/libraryController.js:121
+**File:** server/src/controllers/libraryController.js:135
 **Found:** 2026-11-06 by /audit independent (scope: current; lens: quality)
 **Why it matters:** The comment ends with `(F-15)`, the only finding ID in client/src or server/src. Bare IDs are scoped to the live ledger: `/complete` archives this one under a work-item prefix and the ledger later restarts its numbering, so a future F-15 could be an unrelated finding and mislead a reader. The rest of the comment already explains the reason in full.
 **Suggested fix:** Delete ` (F-15)` from the comment. No current requirement would be lost.
-**Resolution:**
+**Resolution:** Re-examined by /audit independent at ba72d08 and still open. The comment moved from line 121 to line 135 because feature 12 pulled the title and poster checks out into shared helpers above it.
 
 ### F-22 [P3] open - Cancelling the rename form during a save does not cancel the save
 
@@ -101,4 +101,20 @@
 **Found:** 2026-11-08 by /audit independent (scope: current; lens: quality)
 **Why it matters:** Escape (line 21) and Cancel (line 41) call `onClose` even while `form.pending` is true, but the PATCH already in flight keeps running. If it succeeds, the heading changes after the user chose Cancel. If it fails (a 409 duplicate name or a network error), `useListForm` sets errors on a form that is no longer mounted, so the user is never told, and the coding standards ask the client not to swallow failures silently. The window is only as long as one request, so this is a small edge case. Found by reading the code path, not run in a browser.
 **Suggested fix:** While `form.pending` is true, ignore Escape and mark Cancel `aria-disabled` (the pattern Save already uses), so the form stays open until the request settles. No current requirement would be lost.
+**Resolution:**
+
+### F-23 [P3] open - The Add to list dialog drops focus when it reloads its lists
+
+**File:** client/src/hooks/useListMembership.js:17
+**Found:** 2026-11-08 by /audit independent (scope: current; lens: quality)
+**Why it matters:** `load` sets the loading state first, which unmounts whatever had focus inside the dialog. That happens in two places: pressing "Try again" (client/src/components/lists/AddToListButton.jsx:107) removes the focused button, and a 404 on a toggle (useListMembership.js:42) removes the focused checkbox. Focus then falls back to the document body while the modal is still open, so a keyboard or screen reader user loses their place and has to Tab back in. This is the F-05/F-09 pattern in new code, and inside a modal it is more disorienting. Found by reading the code path, not run in a browser.
+**Suggested fix:** Before calling `load` from those two paths, move focus to an element that stays mounted, such as the dialog heading with `tabIndex={-1}` (the approach ListsPage and ListDetailsPage already use for their retries). No current requirement would be lost.
+**Resolution:**
+
+### F-24 [P3] open - Removing two movies quickly can leave focus on nothing
+
+**File:** client/src/pages/ListDetailsPage.jsx:72
+**Found:** 2026-11-08 by /audit independent (scope: current; lens: quality)
+**Why it matters:** `handleRemove` decides `lastMovie` from the list as it was when the button was pressed. If a list has two movies and the user presses Remove on both before the first request returns, both calls see two movies and take the heading branch (line 77). The second one focuses the "Movies" heading just before the empty state replaces it, so focus ends on the document body instead of "No movies in this list yet.". This only happens when two removals overlap, which the per-button pending guard does not prevent. Found by reading the code path, not run in a browser.
+**Suggested fix:** Decide the focus target after the removal lands rather than before. For example, let `removeMovie` report how many movies remain, or move focus in an effect that runs when `list.movies.length` changes. No current requirement would be lost.
 **Resolution:**

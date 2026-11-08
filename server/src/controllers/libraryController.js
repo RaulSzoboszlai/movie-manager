@@ -31,18 +31,32 @@ function requireRating(rating) {
     return rating;
 }
 
-function parseSnapshot(body) {
-    const { title, genreIds } = body;
-    const tmdbId = parseTmdbId(typeof body.tmdbId === 'number' ? String(body.tmdbId) : '');
-    const posterPath = body.posterPath ?? null;
-    const releaseYear = body.releaseYear ?? null;
+// Shared with list movies, so both snapshots accept and reject the same bodies.
+export function parseBodyTmdbId(tmdbId) {
+    return parseTmdbId(typeof tmdbId === 'number' ? String(tmdbId) : '');
+}
 
+export function parseTitle(title) {
     if (typeof title !== 'string' || title === '') {
         throw httpError(400, 'Title is required');
     }
+    return title;
+}
+
+export function parsePosterPath(posterPath = null) {
     if (posterPath !== null && (typeof posterPath !== 'string' || !posterPath.startsWith('/'))) {
         throw httpError(400, 'Poster path must be a TMDB image path');
     }
+    return posterPath;
+}
+
+function parseSnapshot(body) {
+    const { genreIds } = body;
+    const tmdbId = parseBodyTmdbId(body.tmdbId);
+    const title = parseTitle(body.title);
+    const posterPath = parsePosterPath(body.posterPath ?? null);
+    const releaseYear = body.releaseYear ?? null;
+
     if (releaseYear !== null && (!Number.isInteger(releaseYear) || releaseYear < 0 || releaseYear > MAX_RELEASE_YEAR)) {
         throw httpError(400, 'Release year must be a four-digit year');
     }

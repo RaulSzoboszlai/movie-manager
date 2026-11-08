@@ -8,7 +8,7 @@ function getOffsetClass(rank) {
   return rank >= 10 ? '[--offset:var(--rank-offset-wide)]' : '[--offset:var(--rank-offset)]'
 }
 
-function MovieCard({ movie, rank }) {
+function MovieCard({ movie, rank, controls }) {
   const { tmdbId, title, posterPath, releaseYear } = movie
 
   return (
@@ -40,9 +40,9 @@ function MovieCard({ movie, rank }) {
         </div>
         <h3 className="mt-3 ml-(--offset) text-sm leading-tight font-medium wrap-anywhere">{title}</h3>
       </Link>
-      {releaseYear !== null && <p className="mt-1 ml-(--offset) text-xs text-muted">{releaseYear}</p>}
+      {typeof releaseYear === 'number' && <p className="mt-1 ml-(--offset) text-xs text-muted">{releaseYear}</p>}
       <div className="mt-auto ml-(--offset) pt-3">
-        <LibraryControls movie={movie} />
+        {controls ?? <LibraryControls movie={movie} />}
       </div>
     </article>
   )

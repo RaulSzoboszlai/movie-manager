@@ -1,6 +1,6 @@
 import MovieCard from './MovieCard.jsx'
 
-function MovieGrid({ movies, labelledBy, ref }) {
+function MovieGrid({ movies, labelledBy, ref, renderControls }) {
   return (
     <ul
       ref={ref}
@@ -9,7 +9,7 @@ function MovieGrid({ movies, labelledBy, ref }) {
     >
       {movies.map((movie) => (
         <li key={movie.tmdbId}>
-          <MovieCard movie={movie} />
+          <MovieCard movie={movie} controls={renderControls?.(movie)} />
         </li>
       ))}
     </ul>

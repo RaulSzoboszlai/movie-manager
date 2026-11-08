@@ -55,7 +55,7 @@ Each item below is one Blueprint feature loop: `/feature` → `/implement` → `
 - [x] **11. Custom lists**
   - List model and its CRUD endpoints.
   - Lists page, plus list detail page with a rename option.
-- [ ] **12. Add to list**
+- [x] **12. Add to list**
   - An "Add to list" menu on cards and the details page.
   - Remove a movie from a list.
 - [ ] **13. Profile stats**

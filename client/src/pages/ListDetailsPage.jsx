@@ -1,19 +1,51 @@
 import { useId, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import EditListForm from '../components/lists/EditListForm.jsx'
+import MovieGrid from '../components/movies/MovieGrid.jsx'
+import useLibraryAction, { BUTTON_BASE_CLASS } from '../hooks/useLibraryAction.js'
 import { DANGER_BUTTON, PRIMARY_BUTTON, SECONDARY_BUTTON } from '../components/lists/listStyles.js'
 import useList from '../hooks/useList.js'
 import { formatMovieCount } from '../lib/lists.js'
 
 const LINK_CLASS = 'text-accent underline underline-offset-2 hover:text-accent-hover'
 
-function ListDetails({ list, updateList, deleteList }) {
+const REMOVE_CLASS = 'border-border-strong hover:border-error hover:text-error'
+
+function RemoveButton({ movie, listName, onRemove }) {
+  const { pending, failed, run, ignoreKeyRepeat } = useLibraryAction()
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={(event) => run(event, () => onRemove(movie.tmdbId))}
+        onKeyDown={ignoreKeyRepeat}
+        aria-label={`Remove ${movie.title} from ${listName}`}
+        aria-busy={pending}
+        aria-disabled={pending}
+        className={`${BUTTON_BASE_CLASS} ${REMOVE_CLASS} ${pending ? 'cursor-default opacity-60' : ''}`}
+      >
+        {pending ? 'Removing...' : 'Remove'}
+      </button>
+      {failed && (
+        <p role="alert" className="mt-1 text-xs text-error">
+          Couldn&apos;t remove. Try again.
+        </p>
+      )}
+    </>
+  )
+}
+
+function ListDetails({ list, updateList, deleteList, removeMovie }) {
   const navigate = useNavigate()
   const formId = useId()
   const renameRef = useRef(null)
   const [editing, setEditing] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [deleteError, setDeleteError] = useState('')
+  const moviesHeadingId = useId()
+  const moviesHeadingRef = useRef(null)
+  const emptyRef = useRef(null)
 
   function closeEditor() {
     setEditing(false)
@@ -31,6 +63,18 @@ function ListDetails({ list, updateList, deleteList }) {
     } catch {
       setDeleteError("We couldn't delete this list. Please try again.")
       setDeleting(false)
+    }
+  }
+
+  // The pressed button disappears with its card, so focus moves to what stays: the
+  // Movies heading, or the empty state once the last movie is gone.
+  async function handleRemove(tmdbId) {
+    const lastMovie = list.movies.length === 1
+    if (!(await removeMovie(tmdbId))) return
+    if (lastMovie) {
+      requestAnimationFrame(() => emptyRef.current?.focus())
+    } else {
+      moviesHeadingRef.current?.focus()
     }
   }
 
@@ -62,14 +106,34 @@ function ListDetails({ list, updateList, deleteList }) {
 
       {editing && <EditListForm id={formId} list={list} onSave={updateList} onClose={closeEditor} />}
 
-      {list.movies.length === 0 && <p className="mt-8 text-muted">No movies in this list yet.</p>}
+      {list.movies.length === 0 ? (
+        <p ref={emptyRef} tabIndex={-1} className="mt-8 text-muted outline-none">
+          No movies in this list yet.
+        </p>
+      ) : (
+        <section className="mt-8">
+          <h2
+            id={moviesHeadingId}
+            ref={moviesHeadingRef}
+            tabIndex={-1}
+            className="text-xl font-bold tracking-tight outline-none"
+          >
+            Movies
+          </h2>
+          <MovieGrid
+            movies={list.movies}
+            labelledBy={moviesHeadingId}
+            renderControls={(movie) => <RemoveButton movie={movie} listName={list.name} onRemove={handleRemove} />}
+          />
+        </section>
+      )}
     </>
   )
 }
 
 function ListDetailsPage() {
   const { id } = useParams()
-  const { status, list, retry, updateList, deleteList } = useList(id)
+  const { status, list, retry, updateList, deleteList, removeMovie } = useList(id)
   const contentRef = useRef(null)
 
   // The retry removes this button, so focus moves first to a place that stays.
@@ -112,7 +176,9 @@ function ListDetailsPage() {
           </div>
         )}
 
-        {status === 'ready' && <ListDetails list={list} updateList={updateList} deleteList={deleteList} />}
+        {status === 'ready' && (
+          <ListDetails list={list} updateList={updateList} deleteList={deleteList} removeMovie={removeMovie} />
+        )}
       </div>
     </>
   )
