@@ -145,7 +145,9 @@ movie from the library, move it back and then remove it from the watchlist.
 - `description` (String)
 - `movies` (Array of `{ tmdbId, title, posterPath, addedAt }`) - embedded snapshots
 - `createdAt`, `updatedAt` (Date)
-- Unique compound index on `{ user, name }`
+- Unique compound index on `{ user, name }`, case-insensitive (collation
+  `{ locale: 'en', strength: 2 }`), so one user cannot have "Horror nights" and
+  "horror nights"
 
 > Locked shapes. Feature 9 depends on the SavedMovie index and the
 > `status`/`rating` pairing; feature 10 on `watchedAt` and the 1-5 rating;

@@ -21,7 +21,7 @@
 **Found:** 2026-11-04 by /audit (scope: current; lens: quality)
 **Why it matters:** The `role="alert"` element stays mounted, which helps announcements, but `empty:hidden` removes it from the accessibility tree until text arrives. Some browser and screen reader pairs announce a live region unreliably when it becomes visible and gains content in one update. The same markup is in RegisterPage.jsx:25. The DOM and visible text were checked in Chrome, but no screen reader was run, so this is a lead and not a confirmed defect.
 **Suggested fix:** Test the failed-login message with NVDA or Narrator. If it is not announced, remove `empty:hidden` and drop the empty element's spacing another way. No current requirement would be lost.
-**Resolution:** Re-examined by /audit independent at c006fba and still unverified, since no screen reader was run. The delta moved the lines above by one and adds the same pattern to the logout error at client/src/components/layout/AccountNav.jsx:59, so any test should cover that region too.
+**Resolution:** Re-examined by /audit independent at c006fba and still unverified, since no screen reader was run. The delta moved the lines above by one and adds the same pattern to the logout error at client/src/components/layout/AccountNav.jsx:59, so any test should cover that region too. Re-examined by /audit independent at 7d1db4c and still unverified, since no screen reader was run. Feature 11 adds the same `role="alert"` plus `empty:hidden` pattern in client/src/components/lists/ListFields.jsx:8 (list form errors) and client/src/pages/ListDetailsPage.jsx:59 (delete failure), so any test should cover those too.
 
 ### F-05 [P3] open - "Try again" drops keyboard focus on every session retry
 
@@ -69,7 +69,7 @@
 **Found:** 2026-11-06 by /audit independent (scope: current; lens: quality)
 **Why it matters:** This feature adds a sixth copy of the same alert, button markup and long class string, alongside ProtectedRoute.jsx:22, MovieSection.jsx:28, MovieDetails.jsx:35, SearchPage.jsx:107 and SearchResults.jsx:41. The focus defects F-05 and F-09 live in this markup, and the coding standards ask for shared primitives as local components, so the outstanding fix would have to be repeated in each copy and the copies have already started to differ, with only the library page handling focus. Nothing is broken today.
 **Suggested fix:** Extract a small local retry component that takes the message and the retry handler, and fix F-05 and F-09 there. The library page keeps its focus handling through the handler it passes. No current requirement would be lost.
-**Resolution:** Re-examined by /audit independent at 2b11445 and still open. Feature 10 moved the library page's copy from line 61 to line 113 without adding another copy. The spec leaves this finding out of scope.
+**Resolution:** Re-examined by /audit independent at 2b11445 and still open. Feature 10 moved the library page's copy from line 61 to line 113 without adding another copy. The spec leaves this finding out of scope. Re-examined by /audit independent at 7d1db4c and still open: feature 11 adds two more copies at client/src/pages/ListsPage.jsx:41 and client/src/pages/ListDetailsPage.jsx:107. Both move focus to a container that stays mounted before retrying, so they avoid the F-05/F-09 focus loss, and they take the button classes from client/src/components/lists/listStyles.js, so the copies now differ further. A shared retry component would also replace those two.
 
 ### F-19 [P3] open - Button class strings are exported from the action hook
 
@@ -93,4 +93,12 @@
 **Found:** 2026-11-06 by /audit independent (scope: current; lens: quality)
 **Why it matters:** The comment ends with `(F-15)`, the only finding ID in client/src or server/src. Bare IDs are scoped to the live ledger: `/complete` archives this one under a work-item prefix and the ledger later restarts its numbering, so a future F-15 could be an unrelated finding and mislead a reader. The rest of the comment already explains the reason in full.
 **Suggested fix:** Delete ` (F-15)` from the comment. No current requirement would be lost.
+**Resolution:**
+
+### F-22 [P3] open - Cancelling the rename form during a save does not cancel the save
+
+**File:** client/src/components/lists/EditListForm.jsx:21
+**Found:** 2026-11-08 by /audit independent (scope: current; lens: quality)
+**Why it matters:** Escape (line 21) and Cancel (line 41) call `onClose` even while `form.pending` is true, but the PATCH already in flight keeps running. If it succeeds, the heading changes after the user chose Cancel. If it fails (a 409 duplicate name or a network error), `useListForm` sets errors on a form that is no longer mounted, so the user is never told, and the coding standards ask the client not to swallow failures silently. The window is only as long as one request, so this is a small edge case. Found by reading the code path, not run in a browser.
+**Suggested fix:** While `form.pending` is true, ignore Escape and mark Cancel `aria-disabled` (the pattern Save already uses), so the form stays open until the request settles. No current requirement would be lost.
 **Resolution:**

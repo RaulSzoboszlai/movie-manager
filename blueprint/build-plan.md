@@ -52,7 +52,7 @@ Each item below is one Blueprint feature loop: `/feature` → `/implement` → `
   - *Watched* tab on the library page.
 
 ## Phase 4 — Lists & profile
-- [ ] **11. Custom lists**
+- [x] **11. Custom lists**
   - List model and its CRUD endpoints.
   - Lists page, plus list detail page with a rename option.
 - [ ] **12. Add to list**

@@ -5,6 +5,7 @@ import mongoose from 'mongoose';
 import { errorHandler, notFound } from './middleware/errorHandler.js';
 import authRoutes from './routes/auth.js';
 import libraryRoutes from './routes/library.js';
+import listRoutes from './routes/lists.js';
 import movieRoutes from './routes/movies.js';
 
 const missing = ['MONGO_URI', 'CLIENT_URL', 'JWT_SECRET', 'TMDB_API_KEY'].filter((name) => !process.env[name]);
@@ -33,6 +34,7 @@ app.get('/api/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/movies', movieRoutes);
 app.use('/api/library', libraryRoutes);
+app.use('/api/lists', listRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
